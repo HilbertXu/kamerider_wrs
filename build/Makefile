@@ -1972,71 +1972,6 @@ darknet_ros/fast:
 	$(MAKE) -f darknet_ros/darknet_ros/CMakeFiles/darknet_ros.dir/build.make darknet_ros/darknet_ros/CMakeFiles/darknet_ros.dir/build
 .PHONY : darknet_ros/fast
 
-#=============================================================================
-# Target rules for targets named sigverse_ros_bridge
-
-# Build rule for target.
-sigverse_ros_bridge: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 sigverse_ros_bridge
-.PHONY : sigverse_ros_bridge
-
-# fast build rule for target.
-sigverse_ros_bridge/fast:
-	$(MAKE) -f sigverse_ros_package/sigverse_ros_bridge/CMakeFiles/sigverse_ros_bridge.dir/build.make sigverse_ros_package/sigverse_ros_bridge/CMakeFiles/sigverse_ros_bridge.dir/build
-.PHONY : sigverse_ros_bridge/fast
-
-#=============================================================================
-# Target rules for targets named teleop_key
-
-# Build rule for target.
-teleop_key: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 teleop_key
-.PHONY : teleop_key
-
-# fast build rule for target.
-teleop_key/fast:
-	$(MAKE) -f sigverse_ros_package/samples/turtlebot3/laser_distance_sensor/CMakeFiles/teleop_key.dir/build.make sigverse_ros_package/samples/turtlebot3/laser_distance_sensor/CMakeFiles/teleop_key.dir/build
-.PHONY : teleop_key/fast
-
-#=============================================================================
-# Target rules for targets named grasping_teleop_key
-
-# Build rule for target.
-grasping_teleop_key: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 grasping_teleop_key
-.PHONY : grasping_teleop_key
-
-# fast build rule for target.
-grasping_teleop_key/fast:
-	$(MAKE) -f sigverse_ros_package/samples/turtlebot3/open_manipulator_chain/CMakeFiles/grasping_teleop_key.dir/build.make sigverse_ros_package/samples/turtlebot3/open_manipulator_chain/CMakeFiles/grasping_teleop_key.dir/build
-.PHONY : grasping_teleop_key/fast
-
-#=============================================================================
-# Target rules for targets named grasping_auto
-
-# Build rule for target.
-grasping_auto: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 grasping_auto
-.PHONY : grasping_auto
-
-# fast build rule for target.
-grasping_auto/fast:
-	$(MAKE) -f sigverse_ros_package/samples/turtlebot3/open_manipulator_chain/CMakeFiles/grasping_auto.dir/build.make sigverse_ros_package/samples/turtlebot3/open_manipulator_chain/CMakeFiles/grasping_auto.dir/build
-.PHONY : grasping_auto/fast
-
-#=============================================================================
-# Target rules for targets named recognize_pointed_direction
-
-# Build rule for target.
-recognize_pointed_direction: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 recognize_pointed_direction
-.PHONY : recognize_pointed_direction
-
-# fast build rule for target.
-recognize_pointed_direction/fast:
-	$(MAKE) -f sigverse_ros_package/samples/turtlebot3/open_manipulator_chain/CMakeFiles/recognize_pointed_direction.dir/build.make sigverse_ros_package/samples/turtlebot3/open_manipulator_chain/CMakeFiles/recognize_pointed_direction.dir/build
-.PHONY : recognize_pointed_direction/fast
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -2189,11 +2124,6 @@ help:
 	@echo "... _darknet_ros_msgs_generate_messages_check_deps_CheckForObjectsGoal"
 	@echo "... darknet_ros_lib"
 	@echo "... darknet_ros"
-	@echo "... sigverse_ros_bridge"
-	@echo "... teleop_key"
-	@echo "... grasping_teleop_key"
-	@echo "... grasping_auto"
-	@echo "... recognize_pointed_direction"
 .PHONY : help
 
 

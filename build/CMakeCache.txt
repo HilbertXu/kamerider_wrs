@@ -735,7 +735,7 @@ interactive_cleanup_DIR:PATH=
 interactive_cleanup_SOURCE_DIR:STATIC=/home/kamerider/sim_ws/src/CleanUp/interactive-cleanup-ros
 
 //Path to a library.
-lib:FILEPATH=/opt/ros/kinetic/lib/libtf2.so
+lib:FILEPATH=/opt/ros/kinetic/lib/librospack.so
 
 //The directory containing a CMake configuration file for message_filters.
 message_filters_DIR:PATH=/opt/ros/kinetic/share/message_filters/cmake
@@ -1014,7 +1014,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=7
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
