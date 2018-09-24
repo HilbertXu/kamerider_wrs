@@ -21,7 +21,7 @@ class openpose_ros:
 		if msg.data == 'start':
 			os.getcwd()
 			os.chdir(self.openpose_dir)
-			os.system("./build/examples/openpose/openpose.bin --image_dir /home/kamerider/sim_ws/src/CleanUp/interactive-cleanup-ros/openpose_img --hand true --write_keypoint /home/kamerider/sim_ws/src/CleanUp/interactive-cleanup-ros/json_files --write_keypoint_format xml")
+			os.system("./build/examples/openpose/openpose.bin --image_dir /home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/openpose_img --hand true --write_keypoint /home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/json_files --write_keypoint_format xml")
 			self.openpose_pub.publish('finish')
 
 

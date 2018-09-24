@@ -117,10 +117,14 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/kamerider/sim_ws/build/gtest/cmake_install.cmake")
-  include("/home/kamerider/sim_ws/build/CleanUp/interactive-cleanup-ros/cmake_install.cmake")
+  include("/home/kamerider/sim_ws/build/CleanUp/interactive_cleanup/cmake_install.cmake")
   include("/home/kamerider/sim_ws/build/CleanUp/openpose_ros/cmake_install.cmake")
   include("/home/kamerider/sim_ws/build/darknet_ros/darknet_ros_msgs/cmake_install.cmake")
   include("/home/kamerider/sim_ws/build/darknet_ros/darknet_ros/cmake_install.cmake")
+  include("/home/kamerider/sim_ws/build/sigverse_ros_package/sigverse_ros_bridge/cmake_install.cmake")
+  include("/home/kamerider/sim_ws/build/sigverse_ros_package/samples/turtlebot2/cmake_install.cmake")
+  include("/home/kamerider/sim_ws/build/sigverse_ros_package/samples/turtlebot3/laser_distance_sensor/cmake_install.cmake")
+  include("/home/kamerider/sim_ws/build/sigverse_ros_package/samples/turtlebot3/open_manipulator_chain/cmake_install.cmake")
 
 endif()
 

@@ -1,6 +1,6 @@
 set(_CATKIN_CURRENT_PACKAGE "interactive_cleanup")
 set(interactive_cleanup_VERSION "0.1.0")
-set(interactive_cleanup_MAINTAINER "inamura laboratory <inamura.laboratory@gmail.com>")
+set(interactive_cleanup_MAINTAINER "kamerider <kamerider@todo.todo>")
 set(interactive_cleanup_PACKAGE_FORMAT "1")
 set(interactive_cleanup_BUILD_DEPENDS "roscpp" "rospy" "std_msgs" "geometry_msgs" "trajectory_msgs" "message_generation")
 set(interactive_cleanup_BUILD_EXPORT_DEPENDS "roscpp" "rospy" "std_msgs" "geometry_msgs" "trajectory_msgs" "message_runtime")

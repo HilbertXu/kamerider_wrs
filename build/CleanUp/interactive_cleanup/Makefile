@@ -1576,21 +1576,6 @@ pcl_msgs_generate_messages_lisp/fast:
 .PHONY : pcl_msgs_generate_messages_lisp/fast
 
 # Convenience name for target.
-CleanUp/interactive_cleanup/CMakeFiles/interactive_cleanup_sample.dir/rule:
-	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/interactive_cleanup_sample.dir/rule
-.PHONY : CleanUp/interactive_cleanup/CMakeFiles/interactive_cleanup_sample.dir/rule
-
-# Convenience name for target.
-interactive_cleanup_sample: CleanUp/interactive_cleanup/CMakeFiles/interactive_cleanup_sample.dir/rule
-
-.PHONY : interactive_cleanup_sample
-
-# fast build rule for target.
-interactive_cleanup_sample/fast:
-	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/interactive_cleanup_sample.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/interactive_cleanup_sample.dir/build
-.PHONY : interactive_cleanup_sample/fast
-
-# Convenience name for target.
 CleanUp/interactive_cleanup/CMakeFiles/pcl_msgs_generate_messages_nodejs.dir/rule:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/pcl_msgs_generate_messages_nodejs.dir/rule
 .PHONY : CleanUp/interactive_cleanup/CMakeFiles/pcl_msgs_generate_messages_nodejs.dir/rule
@@ -2039,7 +2024,6 @@ help:
 	@echo "... topic_tools_generate_messages_eus"
 	@echo "... nodelet_topic_tools_gencfg"
 	@echo "... pcl_msgs_generate_messages_lisp"
-	@echo "... interactive_cleanup_sample"
 	@echo "... pcl_msgs_generate_messages_nodejs"
 	@echo "... std_srvs_generate_messages_nodejs"
 	@echo "... pcl_msgs_generate_messages_cpp"

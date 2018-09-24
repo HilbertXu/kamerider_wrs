@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<opencv_storage>
+	
+	<Unity_To_Map_Matrix type_id="opencv-matrix">
+		<rows>4</rows>
+		<cols>4</cols>
+		<dt>d</dt>
+		<data>
+			0 0 1 3.5
+			-1 0 0 -2
+			0 1 0 0
+			0 0 0 1
+		</data>
+	</Unity_To_Map_Matrix>
+	
+	<!-- Pick_it_up! Possible Pos -->
+	<GCP_num>18</GCP_num>
+	
+	<GCP_Name_1>"GraspingCandidatesPosition01"</GCP_Name_1>
+	<GCP_Name_2>"GraspingCandidatesPosition02"</GCP_Name_2>
+	<GCP_Name_3>"GraspingCandidatesPosition03"</GCP_Name_3>
+	<GCP_Name_4>"GraspingCandidatesPosition04"</GCP_Name_4>
+	<GCP_Name_5>"GraspingCandidatesPosition05"</GCP_Name_5>
+	<GCP_Name_6>"GraspingCandidatesPosition06"</GCP_Name_6>
+	<GCP_Name_7>"GraspingCandidatesPosition07"</GCP_Name_7>
+	<GCP_Name_8>"GraspingCandidatesPosition08"</GCP_Name_8>
+	<GCP_Name_9>"GraspingCandidatesPosition09"</GCP_Name_9>
+	<GCP_Name_10>"GraspingCandidatesPosition10"</GCP_Name_10>
+	<GCP_Name_11>"GraspingCandidatesPosition11"</GCP_Name_11>
+	<GCP_Name_12>"GraspingCandidatesPosition12"</GCP_Name_12>
+	<GCP_Name_13>"GraspingCandidatesPosition13"</GCP_Name_13>
+	<GCP_Name_14>"GraspingCandidatesPosition14"</GCP_Name_14>
+	<GCP_Name_15>"GraspingCandidatesPosition15"</GCP_Name_15>
+	<GCP_Name_16>"GraspingCandidatesPosition16"</GCP_Name_16>
+	<GCP_Name_17>"GraspingCandidatesPosition17"</GCP_Name_17>
+	<GCP_Name_18>"GraspingCandidatesPosition18"</GCP_Name_18>
+
+	<GCP_In_Unity type_id="opencv-matrix">
+		<rows>18</rows>
+		<cols>3</cols>
+		<dt>d</dt>
+		<data>
+			-5.48	0.775	-1.52
+			-5.16	0.775	-1.242
+			-6.726	0.775	0.162
+			-5.839	0.493	-2.845
+			-4.534	0.672	-4.474
+			-5.073	0.493	-3.411
+			-0.331	0.545	-2.391
+			-0.373	0.545	-1.78
+			-0.375	0.545	-1.171
+			-0.335	0.05	-3.839
+			-4.635	0.05	-3.06
+			-4.41	0.05	0.5
+			-1.06	0.05	-0.48
+			-2.82	0.05	-5.12
+			-2.86	0.05	-1.38
+			-2.734	0.05	0.705
+			-1.767	0.545	1.039
+			-0.687	0.545	0.974
+		</data>
+	</GCP_In_Unity>
+	
+	
+	<!-- Clean_up! Possible Pos -->
+	<DCP_num>8</DCP_num>
+	
+	<DCP_Name_1>"wide_trashbox_c01"</DCP_Name_1>
+	<DCP_Name_2>"wide_trashbox_c02"</DCP_Name_2>
+	<DCP_Name_3>"wide_trashbox_c03"</DCP_Name_3>
+	<DCP_Name_4>"lowtable_A"</DCP_Name_4>
+	<DCP_Name_5>"wagon_c02_1"</DCP_Name_5>
+	<DCP_Name_6>"wagon_c02_2"</DCP_Name_6>
+	<DCP_Name_7>"sidetable_A_1"</DCP_Name_7>
+	<DCP_Name_8>"sidetable_A_2"</DCP_Name_8>
+	
+	<DCP_In_Unity type_id="opencv-matrix">
+		<rows>8</rows>
+		<cols>3</cols>
+		<dt>d</dt>
+		<data>
+			-3.62	0.592	-5.17
+			-1.93	0.592	-5.17
+			-0.5	0.592	-5.17
+			-5.524	0.443	-3.129
+			-5.326	0.725	-1.361
+			-6.64	0.725	0.29
+			-0.1196144	0.495	-1.746132
+			-1.24	0.495	1.2
+		</data>
+	</DCP_In_Unity>
+</opencv_storage>
