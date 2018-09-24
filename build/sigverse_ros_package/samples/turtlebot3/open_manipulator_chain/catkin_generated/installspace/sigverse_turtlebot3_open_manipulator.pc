@@ -1,0 +1,8 @@
+prefix=/home/kamerider/sim_ws/install
+
+Name: sigverse_turtlebot3_open_manipulator
+Description: Description of sigverse_turtlebot3_open_manipulator
+Version: 0.1.0
+Cflags: 
+Libs: -L/home/kamerider/sim_ws/install/lib 
+Requires: darknet_ros_msgs

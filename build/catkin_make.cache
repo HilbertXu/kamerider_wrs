@@ -1,0 +1,2 @@
+CleanUp/interactive-cleanup-ros:CleanUp/openpose_ros:darknet_ros/darknet_ros:darknet_ros/darknet_ros_msgs:sigverse_ros_package/samples/turtlebot2:sigverse_ros_package/samples/turtlebot3/laser_distance_sensor:sigverse_ros_package/samples/turtlebot3/open_manipulator_chain:sigverse_ros_package/sigverse_ros_bridge
+-DCATKIN_DEVEL_PREFIX=/home/kamerider/sim_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kamerider/sim_ws/install -G Unix Makefiles

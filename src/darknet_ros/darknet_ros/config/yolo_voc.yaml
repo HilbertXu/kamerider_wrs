@@ -1,0 +1,19 @@
+yolo_model:
+
+  config_file:
+    name: yolo-voc.cfg
+  weight_file:
+    name: yolo-voc_5000.weights
+  threshold:
+    value: 0.55
+  detection_classes:
+    names:
+      - rabbit
+
+ 
+    
+
+
+
+
+
