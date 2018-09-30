@@ -3,12 +3,27 @@ yolo_model:
   config_file:
     name: yolo-voc.cfg
   weight_file:
-    name: yolo-voc_5000.weights
+    name: yolo-voc-me_15000.weights
   threshold:
-    value: 0.55
+    value: 0.25
   detection_classes:
     names:
-      - rabbit
+      - apple
+      - donburi
+      - tumbler
+      - trash_box_for_recycle
+      - trash_box_for_burnable
+      - trash_box_for_bottle_can
+      - bear_doll
+      - dog_doll
+      - ketchup
+      - soysauce
+      - toy_penguin
+      - rabbit_doll
+      - canned_juice
+      - cup
+      - sauce
+      - sugar
 
  
     

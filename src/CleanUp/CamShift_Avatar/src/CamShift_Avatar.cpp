@@ -155,6 +155,7 @@ int main( int argc, char** argv )
 	}
 	{
 		Mat Img=imread("../Resource/PoseDir/Img.png");
+		cv::imshow("pose image", Img);
 		string Path=PoseDir+"/Img.png";
 		imwrite(Path,Img);
 	}

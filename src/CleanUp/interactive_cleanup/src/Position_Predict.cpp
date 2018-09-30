@@ -24,6 +24,14 @@
 #include <opencv2/highgui/highgui.hpp>
 #include "std_msgs/String.h"
 
+//navigation中需要使用的位姿信息头文件
+#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Point.h>
+#include <geometry_msgs/PoseWithCovariance.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Quaternion.h>
+
 using namespace std;
 using namespace cv;
 
@@ -66,9 +74,10 @@ const int ImgWidth = 640;//头部传感器拍摄到的RGB图片宽度
 const int ImgHeight = 480;//头部传感器拍摄到的RGB图片高度
 
 //png, json, xml文件保存路径
-string png_dir = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/openpose_img";
-string json_dir = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/json_files";
-string xml_dir = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/UPose.xml";
+string png_dir      = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/openpose_img";
+string json_dir     = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/json_files";
+string xml_dir      = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/MPose.xml";
+string output_dir   = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/output_file";
 
 //Subscriber & Publisher
 ros::Subscriber img_sub;//头部传感器RGB图片的订阅器
@@ -81,6 +90,8 @@ ros::Publisher openpose_pub;//start openpose
 ros::Publisher pcl_pub;//点云转到map坐标系下坐标后的发布器
 ros::Publisher predict_pub;//发布最终结果
 ros::Publisher Avatar_pub;
+ros::Publisher GCP_pub;
+ros::Publisher DCP_pub;
 
 //Matrixs & Vectors
 //GCP = Grasping Candidate Position
@@ -88,10 +99,67 @@ ros::Publisher Avatar_pub;
 cv::Mat Unity_To_Map_Matrix;//Unity坐标系在Map坐标系下的描述
 cv::Mat GCP_In_Unity;//抓取点在Unity下的位置坐标
 cv::Mat DCP_In_Unity;//放置点在Unity下的坐标
+cv::Mat M_Pos_DCP_;
 vector<string> GCP_Names;//抓取点名称
 vector<string> DCP_Names;//放置点名称
 vector<string> GCP_Names_sort;//抓取点名称排序
 vector<string> DCP_Names_sort;//放置点名称排序
+Mat M_Pos_Furniture;//家具上表面三点坐标,每行一个家具的三个点,每个点有xyz
+vector<string> Furniture_Names;//家具名称
+string GroundName="Ground";//地面名称
+
+//navigation points
+geometry_msgs::Pose GCP_Pose;
+geometry_msgs::Pose DCP_Pose;
+
+//Print Matrix
+void PrintMat(Mat&X,char*Name)
+{
+	printf("%s=[\n",Name);
+	int H=X.rows;
+	int W=X.cols;
+	double*p=(double*)(X.data);
+	for(int i=0;i<H;i++)
+	{
+		for(int j=0;j<W;j++)
+		{
+			printf("%.17g ",p[j+i*W]);
+		}
+		cout<<endl;
+	}
+	if(Name == "GCP_Res")
+	{
+		string path = output_dir + "/GCP_Res.txt";
+		ofstream file;
+		file.open(&(path[0]));
+		double *ptr = (double*)(X.data);
+		for(int i=0; i < H ;i++)
+		{
+			for(int j = 0; j < W ;j++)
+			{
+				double tmp = ptr[j+i*W];
+				file << tmp << " ";
+			}
+			file << endl;
+		}
+	}
+	if(Name == "DCP_Res")
+	{
+		string path = output_dir + "/DCP_Res.txt";
+		ofstream file;
+		file.open(&(path[0]));
+		double *ptr = (double*)(X.data);
+		for(int i=0; i < H ;i++)
+		{
+			for(int j = 0; j < W ;j++)
+			{
+				double tmp = ptr[j+i*W];
+				file << tmp << " ";
+			}
+			file << endl;
+		}
+	}
+}
 
 //四舍五入函数
 double round(double r)
@@ -188,55 +256,89 @@ void Quick_sort(vector<double>&Datas, vector<string>&strIdxs, int left, int righ
 	Quick_sort(Datas, strIdxs, i + 1, right);
 }
 
+Mat ComputePto(double Wx,double Wy,double Wz,
+				double Fx,double Fy,double Fz)
+{
+	//返回矩阵每行对应一个Furniture,最后一行对应地面
+	//各列依次为k u v Valid Dx Dy Dz
+	Mat Result=Mat::zeros(Furniture_Names.size()+1,7,CV_64F);
+	double*pResult=(double*)(Result.data);
+	double*pM_Pos_Furniture=(double*)(M_Pos_Furniture.data);
+	int i=0;
+	for(;i<Furniture_Names.size();i++)
+	{
+		Mat WF=Mat::zeros(3,1,CV_64F);
+		{
+			double*p=(double*)(WF.data);
+			p[0]=Fx-Wx;
+			p[1]=Fy-Wy;
+			p[2]=Fz-Wz;
+		}
+		Mat ABCW=Mat::zeros(3,3,CV_64F);
+		double Ax,Ay,Az,Bx,By,Bz,Cx,Cy,Cz;
+		{
+			double*p=(double*)(ABCW.data);
+			Ax=pM_Pos_Furniture[i*M_Pos_Furniture.cols+0];
+			Ay=pM_Pos_Furniture[i*M_Pos_Furniture.cols+1];
+			Az=pM_Pos_Furniture[i*M_Pos_Furniture.cols+2];
+			Bx=pM_Pos_Furniture[i*M_Pos_Furniture.cols+3];
+			By=pM_Pos_Furniture[i*M_Pos_Furniture.cols+4];
+			Bz=pM_Pos_Furniture[i*M_Pos_Furniture.cols+5];
+			Cx=pM_Pos_Furniture[i*M_Pos_Furniture.cols+6];
+			Cy=pM_Pos_Furniture[i*M_Pos_Furniture.cols+7];
+			Cz=pM_Pos_Furniture[i*M_Pos_Furniture.cols+8];
+			
+			p[0]=Bx-Wx;p[1]=Cx-Bx;p[2]=Ax-Bx;
+			p[3]=By-Wy;p[4]=Cy-By;p[5]=Ay-By;
+			p[6]=Bz-Wz;p[7]=Cz-Bz;p[8]=Az-Bz;
+		}
+		Mat Kuv=(ABCW.inv())*WF;
+		double*p=(double*)(Kuv.data);
+		double k=p[0];
+		double u=p[1]/p[0];
+		double v=p[2]/p[0];
+		
+		pResult[i*Result.cols]=k;
+		pResult[i*Result.cols+1]=u;
+		pResult[i*Result.cols+2]=v;
+		if(k>0&&k<1&&u>=0&&u<=1&&v>=0&&v<=1)pResult[i*Result.cols+3]=1;
+		pResult[i*Result.cols+4]=Bx+u*(Cx-Bx)+v*(Ax-Bx);
+		pResult[i*Result.cols+5]=By+u*(Cy-By)+v*(Ay-By);
+		pResult[i*Result.cols+6]=Bz+u*(Cz-Bz)+v*(Az-Bz);
+	}
+	
+	double Gx,Gy,Gz=0;
+	double k=(Gz-Wz)/(Fz-Wz);//==(Gy-Wy)/(Fy-Wy)==(Gx-Wx)/(Fx-Wx)
+	Gx=k*(Fx-Wx)+Wx;
+	Gy=k*(Fy-Wy)+Wy;
+	pResult[i*Result.cols+3]=1;
+	pResult[i*Result.cols+4]=Gx;
+	pResult[i*Result.cols+5]=Gy;
+	
+	return Result;
+}
+
 //读取xml函数
-void ReadModelsXml(string&xml_dir,Mat&Unity_To_Map_Matrix,
-	                              vector<string>&GCP_Names,
-	                              Mat&GCP_In_Unity,
-	                              vector<string>&DCP_Names,
-	                              Mat&DCP_In_Unity)
+void ReadModelsXml(string &xml_dir, Mat &M_Pos_Furniture, vector<string> &Furniture_Names)
+									
 {
 	FileStorage xmlFile(xml_dir, FileStorage::READ);
-
-	//读取unity to map matrix
-	Unity_To_Map_Matrix = Mat::zeros(4,4,CV_64F);
-	xmlFile["Unity_To_Map_Matrix"] >> Unity_To_Map_Matrix;
+	int N_Furniture;
+	xmlFile["M_Pos_Furniture"]["rows"]>>N_Furniture;
 	
-	//读取GCP位置个数
-	int GCP_num;
-	xmlFile["GCP_num"]>>GCP_num;
-	
-	//读取GCP位置的名字
-	for(int i = 1;i <= GCP_num;i++)
+	//读取Furniture位置的名字
+	for(int i=1;i<=N_Furniture;i++)
 	{
 		string TmpStr;
-		sprintf(Buffer,"GCP_Name_%d",i);
+		sprintf(Buffer,"Furniture_Name_%d",i);
 		xmlFile[Buffer]>>TmpStr;
-		GCP_Names.push_back(TmpStr);
+		Furniture_Names.push_back(TmpStr);
 	}
 	
-	//读取GCP位置,每行一个坐标行向量
-	GCP_In_Unity=Mat::zeros(GCP_num,3,CV_64F);
-	xmlFile["GCP_In_Unity"] >> GCP_In_Unity;
-	std::cout << GCP_In_Unity <<endl;
-	
-	//读取DCP位置个数
-	int DCP_num;
-	xmlFile["DCP_num"]>>DCP_num;
-	
-	//读取DCP位置的名字
-	for(int i = 1;i <= DCP_num;i++)
-	{
-		string TmpStr;
-		sprintf(Buffer,"DCP_Name_%d",i);
-		xmlFile[Buffer]>>TmpStr;
-		DCP_Names.push_back(TmpStr);
-	}
-	
-	//读取DCP位置,每行一个坐标行向量
-	DCP_In_Unity=Mat::zeros(DCP_num,3,CV_64F);
-	xmlFile["DCP_In_Unity"] >> DCP_In_Unity;
-	std::cout << DCP_In_Unity << endl;
-
+	//读取Furniture位置,每行三个坐标行向量
+	M_Pos_Furniture=Mat::zeros(N_Furniture,9,CV_64F);
+	xmlFile["M_Pos_Furniture"] >> M_Pos_Furniture;
+	std::cout << M_Pos_Furniture <<endl;
 	xmlFile.release();
 }
 
@@ -248,9 +350,9 @@ void ReadXmlKeypoints(string& json_dir,vector<double>& Data,
 {
 	if(flag == 1)//process pick it up xml
 	{
-		ROS_INFO("READING PICK IT UP XML FILES");
+		std::cout << "READING PICK IT UP XML FILES" << endl;
 		{
-			ROS_INFO("READING POSE XML FILE");
+			std::cout << "READING POSE XML FILE" << endl;
 			string pose_dir = json_dir + "/pick_it_up_pose.xml";
 			cv::FileStorage pose_xml(pose_dir, FileStorage::READ);
 			int cols, rows;
@@ -258,13 +360,20 @@ void ReadXmlKeypoints(string& json_dir,vector<double>& Data,
 			pose_xml["pose_0"]["rows"] >> rows;
 			cv::Mat Data_ = Mat::zeros(rows, cols, CV_64F);
 			pose_xml["pose_0"] >> Data_;
-			cout << Data_ << endl;
-			Data = convertMat2Vector(Data_);
+			//cout << Data_ << endl;
+			float *p = (float*)(Data_.data);
+			int N = rows*cols*3;
+			for(int i=0; i<N ;i++)
+			{
+				Data.push_back(double(p[i]));
+				cout << p[i] << " ";
+			}
+			cout<<endl;
 
 		}
 
 		{
-			ROS_INFO("READING RIGHT HAND XML FILE");
+			std::cout << "READING RIGHT HAND XML FILE" << endl;
 			string right_dir = json_dir + "/pick_it_up_hand_right.xml";
 			cv::FileStorage right_xml(right_dir, FileStorage::READ);
 			int cols, rows;
@@ -272,12 +381,20 @@ void ReadXmlKeypoints(string& json_dir,vector<double>& Data,
 			right_xml["hand_right_0"]["rows"] >> rows;
 			cv::Mat Data_R_ = Mat::zeros(rows, cols, CV_64F);
 			right_xml["hand_right_0"] >> Data_R_;
-			cout << Data_R_ << endl;
-			Data_R = convertMat2Vector(Data_R_);
+			//cout << Data_R_ << endl;
+			//Data_R = convertMat2Vector(Data_R_);
+			float *p = (float*)(Data_R_.data);
+			int N = rows*cols*3;
+			for(int i=0; i<N ;i++)
+			{
+				Data_R.push_back(double(p[i]));
+				cout << p[i] << " ";
+			}
+			cout << endl;
 		}
 
 		{
-			ROS_INFO("READING LEFT HAND XML FILE");
+			std::cout << "READING LEFT HAND XML FILE" << endl;
 			string left_dir = json_dir + "/pick_it_up_hand_left.xml";
 			cv::FileStorage left_xml(left_dir, FileStorage::READ);
 			int cols, rows;
@@ -285,8 +402,16 @@ void ReadXmlKeypoints(string& json_dir,vector<double>& Data,
 			left_xml["hand_left_0"]["rows"] >> rows;
 			cv::Mat Data_L_ = Mat::zeros(rows, cols, CV_64F);
 			left_xml["hand_left_0"] >> Data_L_;
-			cout << Data_L_ << endl;
-			Data_L = convertMat2Vector(Data_L_);
+			//cout << Data_L_ << endl;
+			//Data_L = convertMat2Vector(Data_L_);
+			float *p = (float*)(Data_L_.data);
+			int N = rows*cols*3;
+			for(int i=0; i<N ;i++)
+			{
+				Data_L.push_back(double(p[i]));
+				cout << p[i] << " ";
+			}
+			cout << endl;
 		}
 
 
@@ -294,9 +419,9 @@ void ReadXmlKeypoints(string& json_dir,vector<double>& Data,
 	
 	if(flag == 2)//process clean up xml files
 	{
-		ROS_INFO("READING CLEAN UP XML FILES");
+		std::cout << "READING CLEAN UP XML FILES" << endl;
 		{
-			ROS_INFO("READING POSE XML FILE");
+			std::cout << "READING POSE XML FILE" << endl;
 			string pose_dir = json_dir + "/clean_up_pose.xml";
 			cv::FileStorage pose_xml(pose_dir, FileStorage::READ);
 			int cols, rows;
@@ -304,12 +429,20 @@ void ReadXmlKeypoints(string& json_dir,vector<double>& Data,
 			pose_xml["pose_0"]["rows"] >> rows;
 			cv::Mat Data_ = Mat::zeros(rows, cols, CV_64F);
 			pose_xml["pose_0"] >> Data_;
-			cout << Data_ << endl;
-			Data = convertMat2Vector(Data_);
+			//cout << Data_ << endl;
+			//Data = convertMat2Vector(Data_);
+			float *p = (float*)(Data_.data);
+			int N = rows*cols*3;
+			for(int i=0; i<N ;i++)
+			{
+				Data.push_back(double(p[i]));
+				cout << p[i] << " ";
+			}
+			cout << endl;
 		}
 		
 		{
-			ROS_INFO("READING RIGHT HAND XML FILE");
+			std::cout << "READING RIGHT HAND XML FILE" << endl;
 			string right_dir = json_dir + "/clean_up_hand_right.xml";
 			cv::FileStorage right_xml(right_dir, FileStorage::READ);
 			int cols, rows;
@@ -317,12 +450,20 @@ void ReadXmlKeypoints(string& json_dir,vector<double>& Data,
 			right_xml["hand_right_0"]["rows"] >> rows;
 			cv::Mat Data_R_ = Mat::zeros(rows, cols, CV_64F);
 			right_xml["hand_right_0"] >> Data_R_;
-			cout << Data_R_ << endl;
-			Data_R = convertMat2Vector(Data_R_);
+			//cout << Data_R_ << endl;
+			//Data_R = convertMat2Vector(Data_R_);
+			float *p = (float*)(Data_R_.data);
+			int N = rows*cols*3;
+			for(int i=0; i<N ;i++)
+			{
+				Data_R.push_back(double(p[i]));
+				cout << p[i] << " ";
+			}
+			cout << endl;
 		}
 
 		{
-			ROS_INFO("READING LEFT HAND XML FILE");
+			std::cout << "READING LEFT HAND XML FILE" << endl;
 			string left_dir = json_dir + "/clean_up_hand_left.xml";
 			cv::FileStorage left_xml(left_dir, FileStorage::READ);
 			int cols, rows;
@@ -330,44 +471,24 @@ void ReadXmlKeypoints(string& json_dir,vector<double>& Data,
 			left_xml["hand_left_0"]["rows"] >> rows;
 			cv::Mat Data_L_ = Mat::zeros(rows, cols, CV_64F);
 			left_xml["hand_left_0"] >> Data_L_;
-			cout << Data_L_ << endl;
-			Data_L = convertMat2Vector(Data_L_);
+			//cout << Data_L_ << endl;
+			//Data_L = convertMat2Vector(Data_L_);
+			float *p = (float*)(Data_L_.data);
+			int N = rows*cols*3;
+			for(int i=0; i<N ;i++)
+			{
+				Data_L.push_back(double(p[i]));
+				cout << p[i] << " ";
+			}
+			cout << endl;
 		}
 	}
 }
 
-void imageCallback(const sensor_msgs::ImageConstPtr& msg)
-{
-	if(!png_is_saved)
-	{
-		ROS_INFO("Head sensor image received...");
-		if(!pick_image_saved && step_ == pick_it_up)//save pick it up image
-		{
-			ROS_INFO("PICK IT UP IMAGE RECEIVED");
-			cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-			cv::Mat pick_img = cv_ptr -> image;
-			cv::imwrite(png_dir + "/pick_it_up.png", pick_img);
-			pick_image_saved = true;
-		}
-		if(!clean_image_saved && step_ == clean_up)//save clean up image and start openpose
-		{
-			ROS_INFO("CLEAN UP IMAGE RECEIVED");
-			cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-			cv::Mat clean_img = cv_ptr -> image;
-			cv::imwrite(png_dir + "/clean_up.png", clean_img);
-			clean_image_saved = true;
-			//start openpose
-			std_msgs::String flag;
-			flag.data = "start";
-			png_is_saved =true;
-			openpose_pub.publish(flag);
-		}
-	}
-}
 
 void openposeCallback(const std_msgs::String::ConstPtr& msg)
 {
-	ROS_INFO("OPENPOSE FINISHED");
+	std::cout << "OPENPOSE FINISHED" << endl;
 	if(msg->data == "finish")
 	{
 		
@@ -382,7 +503,8 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 			vector<double>Data_R;
 			ReadXmlKeypoints(json_dir,  Data,  Data_L,  Data_R, xml_flag);
 			std::cout<<Buffer;
-			ROS_INFO("start to calculate the transform matrix");
+			//ROS_INFO("start to calculate the transform matrix");
+			/*
 			Mat GCP_In_Unity_ = Mat::ones(4, GCP_In_Unity.rows, CV_64F);//每列一个列向量[x y z 1]'
 			std::cout<<GCP_In_Unity_.type()<<endl;
 			double*pGCP_In_Unity_ = (double*)(GCP_In_Unity_.data);//4行若干列
@@ -397,21 +519,19 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 			std::cout<<Unity_To_Map_Matrix.type()<<endl;
 			Mat GCP_In_Map_ = Unity_To_Map_Matrix*GCP_In_Unity_;//每列存储GCP对应的地图坐标系下坐标[x y z 1]'
 			double*pGCP_In_Map_ = (double*)(GCP_In_Map_.data);//4行若干列
-
+			*/
 			//当前使用起点为手腕,终点为食指第二指节构造射线
 			//首先根据腕部与中轴线距离确定Avatar用的左手还是右手
 			//依次为中间脖子点、左手腕、左手食指第二指节、右手腕、右手食指第二指节
 			//需要变动时改此处的宏定义即可
-			ROS_INFO("predict right hand or left hand");
-			std::cout<<Data[MNeckNum * 3]<<" "<<Data[LWristNum * 3]<<" "<<Data_L[IFinSecNum * 3]<<" "<<Data[RWristNum * 3]<<" "<<Data_R[IFinSecNum * 3]<<endl;
+			//ROS_INFO("predict right hand or left hand");
 			int Mark_Idxs[] = { round(Data[MNeckNum * 3]) + round(Data[MNeckNum * 3 + 1] - 1) * ImgWidth,
-								round(Data[LWristNum * 3]) + round(Data[LWristNum * 3 + 1] - 1) * ImgWidth,
-								round(Data_L[IFinSecNum * 3]) + round(Data_L[IFinSecNum * 3 + 1] - 1) * ImgWidth,
-								round(Data[RWristNum * 3]) + round(Data[RWristNum * 3 + 1] - 1) * ImgWidth,
-								round(Data_R[IFinSecNum * 3]) + round(Data_R[IFinSecNum * 3 + 1] - 1) * ImgWidth };
+							round(Data[LWristNum * 3]) + round(Data[LWristNum * 3 + 1] - 1) * ImgWidth,
+							round(Data_L[IFinSecNum * 3]) + round(Data_L[IFinSecNum * 3 + 1] - 1) * ImgWidth,
+							round(Data[RWristNum * 3]) + round(Data[RWristNum * 3 + 1] - 1) * ImgWidth,
+							round(Data_R[IFinSecNum * 3]) + round(Data_R[IFinSecNum * 3 + 1] - 1) * ImgWidth };
 			//！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
 			//此处最好有从邻域中找非NaN数字的操作,否则极容易导致复原到三维空间中的无效点
-			ROS_INFO("TEST");
 			double M_x = Cloud_Pick.points[Mark_Idxs[0]].x;
 			double M_y = Cloud_Pick.points[Mark_Idxs[0]].y;
 			double M_z = Cloud_Pick.points[Mark_Idxs[0]].z;
@@ -463,59 +583,34 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 				Ri_y = Cloud_Pick.points[Mark_Idxs[4]].y;
 				Ri_z = Cloud_Pick.points[Mark_Idxs[4]].z;
 			}
-
 			/*{
 				printf("%d\n%d\n%d\n%d\n%d\n", Mark_Idxs[0], Mark_Idxs[1], Mark_Idxs[2], Mark_Idxs[3], Mark_Idxs[4]);
 				//调试专用
 				printf("%.17g %.17g %.17g \n%.17g %.17g %.17g \n%.17g %.17g %.17g \n%.17g %.17g %.17g \n%.17g %.17g %.17g \n",
 					M_x, M_y, M_z, Lw_x, Lw_y, Lw_z, Li_x, Li_y, Li_z, Rw_x, Rw_y, Rw_z, Ri_x, Ri_y, Ri_z);
 			}*/
-			ROS_INFO("DATA RECORD");
+			//ROS_INFO("DATA RECORD");
 			vector<double>Dis;
 			if ((Lw_x - M_x)*(Lw_x - M_x) + (Lw_y - M_y)*(Lw_y - M_y) >
 				(Rw_x - M_x)*(Rw_x - M_x) + (Rw_y - M_y)*(Rw_y - M_y))
 			{
 				cout << "Avatar used left hand" << endl;
 				cout << "This is all dis:\n";
-				for (int i = 0; i < GCP_Names.size(); i++)
-				{
-					double GCP_i_x = pGCP_In_Map_[i];
-					double GCP_i_y = pGCP_In_Map_[i + GCP_In_Unity.rows];
-					double GCP_i_z = pGCP_In_Map_[i + GCP_In_Unity.rows * 2];
-
-					//向量WI叉乘向量W_GCP取模得平行四边形面积
-					double dis2 = ((Li_y - Lw_y)*(GCP_i_z - Lw_z) - (GCP_i_y - Lw_y)*(Li_z - Lw_z))*((Li_y - Lw_y)*(GCP_i_z - Lw_z) - (GCP_i_y - Lw_y)*(Li_z - Lw_z)) +
-								((GCP_i_x - Lw_x)*(Li_z - Lw_z) - (Li_x - Lw_x)*(GCP_i_z - Lw_z))*((GCP_i_x - Lw_x)*(Li_z - Lw_z) - (Li_x - Lw_x)*(GCP_i_z - Lw_z)) +
-								((Li_x - Lw_x)*(GCP_i_y - Lw_y) - (GCP_i_x - Lw_x)*(Li_y - Lw_y))*((Li_x - Lw_x)*(GCP_i_y - Lw_y) - (GCP_i_x - Lw_x)*(Li_y - Lw_y));
-					Dis.push_back(sqrt(dis2));
-					
-					cout << Dis[i]<<" ";
-				}
-				cout<< "\n";
+				Mat Res=ComputePto(Lw_x,Lw_y,Lw_z,Li_x,Li_y,Li_z);
+				PrintMat(Res,"GCP_Res");
+				cout << "\n";
 			}
 			else
 			{
 				cout << "Avatar used right hand" << endl;
-				cout << "This is all dis:\n";
-				for (int i = 0; i < GCP_Names.size(); i++)
-				{
-					double GCP_i_x = pGCP_In_Map_[i];
-					double GCP_i_y = pGCP_In_Map_[i + GCP_In_Unity.rows];
-					double GCP_i_z = pGCP_In_Map_[i + GCP_In_Unity.rows * 2];
-
-					//向量WI叉乘向量W_GCP取模得平行四边形面积
-					double dis2 = ((Ri_y - Rw_y)*(GCP_i_z - Rw_z) - (GCP_i_y - Rw_y)*(Ri_z - Rw_z))*((Ri_y - Rw_y)*(GCP_i_z - Rw_z) - (GCP_i_y - Rw_y)*(Ri_z - Rw_z)) +
-								((GCP_i_x - Rw_x)*(Ri_z - Rw_z) - (Ri_x - Rw_x)*(GCP_i_z - Rw_z))*((GCP_i_x - Rw_x)*(Ri_z - Rw_z) - (Ri_x - Rw_x)*(GCP_i_z - Rw_z)) +
-								((Ri_x - Rw_x)*(GCP_i_y - Rw_y) - (GCP_i_x - Rw_x)*(Ri_y - Rw_y))*((Ri_x - Rw_x)*(GCP_i_y - Rw_y) - (GCP_i_x - Rw_x)*(Ri_y - Rw_y));
-					Dis.push_back(sqrt(dis2));
-
-					cout << Dis[i] << " ";
-					//cout << GCP_i_x << " " << GCP_i_y << " " << GCP_i_z << endl;//调试专用
-				}
+				cout << "Avatar used right hand" << endl;
+				Mat Res=ComputePto(Rw_x,Rw_y,Rw_z,Ri_x,Ri_y,Ri_z);
+				PrintMat(Res,"GCP_Res");
 				cout << "\n";
 			}
 
 			//按Dis从小到大排序后的GCP_Names存在了GCP_Names_sort里
+			/*
 			for (int i = 0; i < GCP_Names.size(); i++) 
 			{
 				GCP_Names_sort.push_back(GCP_Names[i]); 
@@ -530,6 +625,7 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 			std_msgs::String StrMsg;
 			StrMsg.data = MsgStr;
 			predict_pub.publish(StrMsg);
+			*/
 			cv::waitKey(1000);
 		}
 
@@ -546,9 +642,6 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 			vector<int>DataNums_R;
 			vector<double>Data_R;
 			ReadXmlKeypoints(json_dir,  Data,  Data_L,  Data_R, xml_flag);
-
-			
-
 			Mat DCP_In_Unity_ = Mat::ones(4, DCP_In_Unity.rows, CV_64F);//每列一个列向量[x y z 1]'
 			double*pDCP_In_Unity_ = (double*)(DCP_In_Unity_.data);//4行若干列
 			double*pDCP_In_Unity = (double*)(DCP_In_Unity.data);//若干行3列
@@ -558,8 +651,8 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 				pDCP_In_Unity_[i + DCP_In_Unity.rows] = pDCP_In_Unity[i * 3 + 1];
 				pDCP_In_Unity_[i + DCP_In_Unity.rows * 2] = pDCP_In_Unity[i * 3 + 2];
 			}
-			Mat DCP_In_Map_ = Unity_To_Map_Matrix*DCP_In_Unity_;//每列存储DCP对应的地图坐标系下坐标[x y z 1]'
-			double*pDCP_In_Map_ = (double*)(DCP_In_Map_.data);//4行若干列
+			//Mat DCP_In_Map_ = Unity_To_Map_Matrix*DCP_In_Unity_;//每列存储DCP对应的地图坐标系下坐标[x y z 1]'
+			double*pM_Pos_DCP_ = (double*)(M_Pos_DCP_.data);//4行若干列
 
 															//当前使用起点为手腕,终点为食指第二指节构造射线
 															//首先根据腕部与中轴线距离确定Avatar用的左手还是右手
@@ -638,9 +731,9 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 				
 				for (int i = 0; i < DCP_Names.size(); i++)
 				{
-					double DCP_i_x = pDCP_In_Map_[i];
-					double DCP_i_y = pDCP_In_Map_[i + DCP_In_Unity.rows];
-					double DCP_i_z = pDCP_In_Map_[i + DCP_In_Unity.rows * 2];
+					double DCP_i_x = pM_Pos_DCP_[i];
+					double DCP_i_y = pM_Pos_DCP_[i + DCP_In_Unity.rows];
+					double DCP_i_z = pM_Pos_DCP_[i + DCP_In_Unity.rows * 2];
 
 					//向量WI叉乘向量W_DCP取模得平行四边形面积
 					double dis2 = ((Li_y - Lw_y)*(DCP_i_z - Lw_z) - (DCP_i_y - Lw_y)*(Li_z - Lw_z))*((Li_y - Lw_y)*(DCP_i_z - Lw_z) - (DCP_i_y - Lw_y)*(Li_z - Lw_z)) +
@@ -651,6 +744,8 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 					cout << Dis[i] << " ";
 				}
 				cout << "\n";
+				Mat Res=ComputePto(Lw_x,Lw_y,Lw_z,Li_x,Li_y,Li_z);
+				PrintMat(Res,"DCP_Res");
 			}
 			else
 			{
@@ -658,9 +753,9 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 				cout << "This is all dis:\n";
 				for (int i = 0; i < DCP_Names.size(); i++)
 				{
-					double DCP_i_x = pDCP_In_Map_[i];
-					double DCP_i_y = pDCP_In_Map_[i + DCP_In_Unity.rows];
-					double DCP_i_z = pDCP_In_Map_[i + DCP_In_Unity.rows * 2];
+					double DCP_i_x = pM_Pos_DCP_[i];
+					double DCP_i_y = pM_Pos_DCP_[i + DCP_In_Unity.rows];
+					double DCP_i_z = pM_Pos_DCP_[i + DCP_In_Unity.rows * 2];
 
 					//向量WI叉乘向量W_DCP取模得平行四边形面积
 					double dis2 = ((Ri_y - Rw_y)*(DCP_i_z - Rw_z) - (DCP_i_y - Rw_y)*(Ri_z - Rw_z))*((Ri_y - Rw_y)*(DCP_i_z - Rw_z) - (DCP_i_y - Rw_y)*(Ri_z - Rw_z)) +
@@ -672,6 +767,9 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 					//cout << DCP_i_x << " " << DCP_i_y << " " << DCP_i_z << endl;//调试专用
 				}
 				cout << "\n";
+				Mat Res=ComputePto(Rw_x,Rw_y,Rw_z,Ri_x,Ri_y,Ri_z);
+				PrintMat(Res,"DCP_Res");
+				
 			}
 			//按Dis从小到大排序后的DCP_Names存在了DCP_Names_sort里
 			for (int i = 0; i < DCP_Names.size(); i++) { DCP_Names_sort.push_back(DCP_Names[i]); }
@@ -682,10 +780,45 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 			std_msgs::String StrMsg;
 			StrMsg.data = MsgStr;
 			predict_pub.publish(StrMsg);
+			
+			//output file
+			string sort_path = output_dir + "/DCP_Sort.txt";
+			ofstream file;
+			file.open(&(sort_path[0]));
+			file.write(MsgStr.c_str(),MsgStr.length());
+			file.close();
 		}
 	}
 }
 
+void imageCallback(const sensor_msgs::ImageConstPtr& msg)
+{
+	if(!png_is_saved)
+	{
+		ROS_INFO("Head sensor image received...");
+		if(!pick_image_saved && step_ == pick_it_up)//save pick it up image
+		{
+			std::cout << "PICK IT UP IMAGE RECEIVED" << endl;
+			cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+			cv::Mat pick_img = cv_ptr -> image;
+			cv::imwrite(png_dir + "/pick_it_up.png", pick_img);
+			pick_image_saved = true;
+		}
+		if(!clean_image_saved && step_ == clean_up)//save clean up image and start openpose
+		{
+			std::cout << "CLEAN UP IMAGE RECEIVED" << endl;
+			cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+			cv::Mat clean_img = cv_ptr -> image;
+			cv::imwrite(png_dir + "/clean_up.png", clean_img);
+			clean_image_saved = true;
+			//start openpose
+			std_msgs::String flag;
+			flag.data = "start";
+			png_is_saved =true;
+			openpose_pub.publish(flag);
+		}
+	}
+}
 
 void pclCallback(sensor_msgs::PointCloud2 msg)
 {
@@ -725,14 +858,14 @@ void pclCallback(sensor_msgs::PointCloud2 msg)
 	std::cout << "PointCloud data is: " << endl;
 	if(step_ == pick_it_up)
 	{
-		ROS_INFO("pick it up pcl calculate");
+		std::cout << "pick it up pcl calculate" << endl;
 		Cloud_Pick.width = msg.width;
 		Cloud_Pick.height = msg.height;
 		Cloud_Pick.points.resize(Cloud_Pick.width * Cloud_Pick.height);
 	}
 	if(step_ == clean_up)
 	{
-		ROS_INFO("clean up pcl calculate");
+		std::cout << "clean up pcl calculate" << endl;
 		Cloud_Clean.width = msg.width;
 		Cloud_Clean.height = msg.height;
 		Cloud_Clean.points.resize(Cloud_Clean.width * Cloud_Clean.height);
@@ -795,7 +928,7 @@ void pclCallback(sensor_msgs::PointCloud2 msg)
 	pcl::removeNaNFromPointCloud(cloud,cloud,map_index);
 	*/
 	pcl::toROSMsg(cloud,oMsg);
-	ROS_INFO("Header frame: map");
+	std::cout << "Header frame: map" << endl;
 	oMsg.header.frame_id = "map";
 	pcl_pub.publish(oMsg);
 	
@@ -807,7 +940,7 @@ void AvatarMsgCallback(interactive_cleanup::InteractiveCleanupMsg msg)
 	cout << msg.detail << "\t" << msg.message << endl;
 	if(msg.message == "Are_you_ready?")
 	{
-		ROS_INFO("SAY I AM READY");
+		std::cout <<"SAY I AM READY" << endl;
 		interactive_cleanup::InteractiveCleanupMsg interactive_cleanup_msg;
     	interactive_cleanup_msg.message = "I_am_ready";
 		Avatar_pub.publish(interactive_cleanup_msg);
@@ -815,12 +948,12 @@ void AvatarMsgCallback(interactive_cleanup::InteractiveCleanupMsg msg)
 	}
 	if(msg.message == "Pick_it_up!")
 	{
-		ROS_INFO("STEP = PICK IT UP");
+		std::cout << "STEP = PICK IT UP" << endl;
 		step_ = pick_it_up;
 	}
 	if(msg.message == "Clean_up!")
 	{
-		ROS_INFO("STEP = CLEAN UP");
+		std::cout << "STEP = CLEAN UP" << endl;
 		step_ = clean_up;
 	}
 	if(msg.message == "Task_failed")
@@ -832,8 +965,18 @@ void AvatarMsgCallback(interactive_cleanup::InteractiveCleanupMsg msg)
 
 int main(int argc, char **argv)
 {
-	ReadModelsXml(xml_dir, Unity_To_Map_Matrix, GCP_Names, GCP_In_Unity, DCP_Names, DCP_In_Unity);
-
+	ReadModelsXml(xml_dir, M_Pos_Furniture, Furniture_Names);
+	int N_DCP=Furniture_Names.size()-1;//前多少个是DCP的家具
+	M_Pos_DCP_=Mat::ones(4,N_DCP,CV_64F);//每一列都是xyz1
+	double*pM_Pos_DCP_=(double*)(M_Pos_DCP_.data);//每一行都是xyz xyz xyz
+	double*pM_Pos_Furniture=(double*)(M_Pos_Furniture.data);
+	for(int i=0;i<N_DCP;i++)
+	{
+		DCP_Names.push_back(Furniture_Names[i]);
+		pM_Pos_DCP_[0*M_Pos_DCP_.cols+i]=(pM_Pos_Furniture[i*M_Pos_Furniture.cols+0]+pM_Pos_Furniture[i*M_Pos_Furniture.cols+6])/2;
+		pM_Pos_DCP_[1*M_Pos_DCP_.cols+i]=(pM_Pos_Furniture[i*M_Pos_Furniture.cols+1]+pM_Pos_Furniture[i*M_Pos_Furniture.cols+7])/2;
+		pM_Pos_DCP_[2*M_Pos_DCP_.cols+i]=(pM_Pos_Furniture[i*M_Pos_Furniture.cols+2]+pM_Pos_Furniture[i*M_Pos_Furniture.cols+8])/2;
+	}
 
 	ros::init(argc, argv, "Position_Predict");
 	ros::NodeHandle nh;
@@ -846,6 +989,8 @@ int main(int argc, char **argv)
 	pcl_pub         = nh.advertise<sensor_msgs::PointCloud2>("/map_points", 1);
 	predict_pub     = nh.advertise<std_msgs::String>("/TargetPostion", 1);
 	Avatar_pub      = nh.advertise<interactive_cleanup::InteractiveCleanupMsg>("/interactive_cleanup/message/to_moderator", 1);
+	GCP_pub         = nh.advertise<geometry_msgs::Pose>("/GCP_Predict", 1);
+	DCP_pub         = nh.advertise<geometry_msgs::Pose>("/DCP_Predict", 1);
 
 	tf::TransformListener Listener;
 	pListener = &Listener;

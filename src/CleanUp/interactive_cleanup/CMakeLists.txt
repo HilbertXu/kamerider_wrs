@@ -20,9 +20,13 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   sensor_msgs
   pcl_ros
+  actionlib
+  actionlib_msgs
+  move_base_msgs
 )
 set(OpenCV_DIR "/home/kamerider/softwares/opencv-3.3.1/build")
 find_package(OpenCV REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system)
 MESSAGE(STATUS, "OpenCV")
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -212,6 +216,10 @@ include_directories(
 include_directories(include ${catkin_INCLUDE_DIRS})
 link_directories(/usr/local/lib)
 
+
+
+
+
 #add_executable(interactive_cleanup_sample src/interactive_cleanup_sample.cpp)
 #target_link_libraries(interactive_cleanup_sample ${catkin_LIBRARIES})
 #add_dependencies(interactive_cleanup_sample ${PROJECT_NAME}_generate_messages_cpp)
@@ -239,4 +247,16 @@ target_link_libraries(pcl ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 add_executable(FollowAvatar src/FollowAvatar.cpp)
 add_dependencies(FollowAvatar ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(FollowAvatar ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(OPArosNew_Xml src/OPArosNew_Xml.cpp)
+add_dependencies(OPArosNew_Xml ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(OPArosNew_Xml ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(cleanup_navigation src/cleanup_navigation.cpp)
+add_dependencies(cleanup_navigation ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(cleanup_navigation ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(write_xml src/write_xml.cpp)
+add_dependencies(write_xml ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(write_xml ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 

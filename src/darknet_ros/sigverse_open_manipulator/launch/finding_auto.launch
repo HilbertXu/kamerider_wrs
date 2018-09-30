@@ -1,0 +1,30 @@
+<launch>
+	<arg name="camera"  default="hsrb/head_rgbd_sensor" />
+
+	<arg name="sub_rgb_camera_info_topic_name"  default="/$(arg camera)/rgb/camera_info" />
+	<arg name="sub_point_cloud_topic_name"      default="/$(arg camera)/depth/points" />
+	<arg name="sub_bounding_boxes_topic_name"   default="/darknet_ros/bounding_boxes" />
+
+	<node name="finding_auto" pkg="sigverse_open_manipulator" type="finding_auto" output="screen" launch-prefix="xterm -e">
+
+		<param name="sub_rgb_camera_info_topic_name"  type="string" value="$(arg sub_rgb_camera_info_topic_name)" />
+		<param name="sub_point_cloud_topic_name"      type="string" value="$(arg sub_point_cloud_topic_name)" />
+		<param name="sub_bounding_boxes_topic_name"   type="string" value="$(arg sub_bounding_boxes_topic_name)" />
+	</node>
+
+        <!-- Config and weights folder. -->
+
+	<arg name="yolo_weights_path"          default="$(find darknet_ros)/yolo_network_config/weights"/>
+	<arg name="yolo_config_path"           default="$(find darknet_ros)/yolo_network_config/cfg"/>
+
+	<!-- Load parameters -->
+	<rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/ros.yaml"/>
+	<rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/yolo_voc.yaml"/>
+
+	<!-- Start darknet and ros wrapper -->
+	<node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="screen">
+		<param name="weights_path"          value="$(arg yolo_weights_path)" />
+		<param name="config_path"           value="$(arg yolo_config_path)" />
+	</node>
+</launch>
+

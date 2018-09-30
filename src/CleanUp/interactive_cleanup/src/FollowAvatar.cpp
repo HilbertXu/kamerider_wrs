@@ -60,7 +60,6 @@ void pitchHead(ros::Publisher &publisher, const std::string &name, const double 
 //订阅头部传感器RGB图片的回调函数
 void imageCallback(sensor_msgs::Image msg)
 {
-	ROS_INFO("Receiving Avatar Image");
 	int height = msg.height;
 	int width = msg.width;
 	int N = msg.data.size();
@@ -88,7 +87,7 @@ void imageCallback(sensor_msgs::Image msg)
 	int X, Y;
 	File >> X >> Y;
 	File.close();
-
+	
 	//控制器
 	double w = 0;
 	{
@@ -146,7 +145,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "FollowAvatar");
 	ros::NodeHandle nh;
 
-	nh.param<std::string>("PoseDir", PoseDir, "/home/kamerider/sim_ws/src/CleanUp/CamShift_Avatar/build/PoseDir/Img.png");
+	nh.param<std::string>("PoseDir", PoseDir, "/home/kamerider/sim_ws/src/CleanUp/CamShift_Avatar/build/PoseDir");
 	sub_Img = nh.subscribe("/hsrb/head_rgbd_sensor/rgb/image_raw", 1, imageCallback);
 	pub_base_twist = nh.advertise<geometry_msgs::Twist>("/hsrb/opt_command_velocity", 1);
 	pub_head_trajectory = nh.advertise<trajectory_msgs::JointTrajectory>("/hsrb/head_trajectory_controller/command", 1);

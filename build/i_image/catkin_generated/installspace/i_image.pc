@@ -1,0 +1,8 @@
+prefix=/home/kamerider/sim_ws/install
+
+Name: i_image
+Description: Description of i_image
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/kamerider/sim_ws/install/lib 
+Requires: 

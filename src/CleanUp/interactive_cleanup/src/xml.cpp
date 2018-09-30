@@ -8,7 +8,7 @@
 using namespace std;
 using namespace cv;
 
-string xml_dir = "/home/kamerider/sim_ws/src/CleanUp/interactive-cleanup-ros/json_files/pick_it_up_hand_right.xml";
+string xml_dir = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/json_files/pick_it_up_hand_right.xml";
 
 vector<double> convertMat2Vector(const Mat &mat)
 {
@@ -29,7 +29,16 @@ int main()
 	Data_ = convertMat2Vector(Data);
 	for(int i =0;i<Data_.size();i++)
 	{
-		std::cout << Data_[i] << endl;
+		std::cout << Data_[i] << " ";
+	}
+	std::cout<<endl;
+	std::vector<double> Data_test;
+	float *p = (float*)(Data.data);
+	int N = rows*cols*3;
+	for (int i=0;i<N;i++)
+	{
+		cout<<p[i]<<" ";
+		Data_test.push_back(double(p[i]));
 	}
 
 }
