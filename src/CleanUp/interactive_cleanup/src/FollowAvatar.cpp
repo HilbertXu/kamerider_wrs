@@ -28,9 +28,13 @@ double Kh = 0.02;//头部俯仰控制器比例系数
 double hTheld = 10;//头部俯仰控制器零位阈值
 double PrePitch = 0;
 
+bool isUseFollowAvatar = true;
+
 ros::Subscriber sub_Img;//头部传感器RGB图片的订阅器
+ros::Subscriber switch_sub;
 ros::Publisher pub_base_twist;//发布速度信息
 ros::Publisher pub_head_trajectory;//发布头部俯仰关节信息
+ros::Publisher step_pub;
 
 void pitchHead(ros::Publisher &publisher, const std::string &name, const double position, const int duration_sec)
 {
@@ -56,88 +60,101 @@ void pitchHead(ros::Publisher &publisher, const std::string &name, const double 
 
 	publisher.publish(joint_trajectory);
 }
-
+void switchCallback(const std_msgs::String::ConstPtr &msg)
+{
+	if(msg->data == "stop")
+	{
+		isUseFollowAvatar = false;
+	}
+	if(msg->data == "start")
+	{
+		isUseFollowAvatar = true;
+	}
+}
 //订阅头部传感器RGB图片的回调函数
 void imageCallback(sensor_msgs::Image msg)
 {
-	int height = msg.height;
-	int width = msg.width;
-	int N = msg.data.size();
-
-	Mat Img = Mat::zeros(height, width, CV_8UC3);
-	unsigned char*pData = Img.data;
-	for (int i = 0;i < N;i = i + 3)
+	if(isUseFollowAvatar)
 	{
-		pData[i + 2] = msg.data[i];
-		pData[i + 1] = msg.data[i + 1];
-		pData[i] = msg.data[i + 2];
-	}
-	cv::imshow("HeadCenterImg", Img);
-	waitKey(10);
+		int height = msg.height;
+		int width = msg.width;
+		int N = msg.data.size();
 
-	//调试Windows_Ubuntu OpenPose通信,控制机器人转,使得Avatar尽可能到达相机正中间
-	imwrite(PoseDir + "/Img.png", Img);
-	string Path = PoseDir + "/ManCenter.txt";
-	ifstream File;
-	File.open(&(Path[0]));
-	while (!File.is_open())
-	{
+		Mat Img = Mat::zeros(height, width, CV_8UC3);
+		unsigned char*pData = Img.data;
+		for (int i = 0;i < N;i = i + 3)
+		{
+			pData[i + 2] = msg.data[i];
+			pData[i + 1] = msg.data[i + 1];
+			pData[i] = msg.data[i + 2];
+		}
+		cv::imshow("HeadCenterImg", Img);
+		waitKey(10);
+
+		//调试Windows_Ubuntu OpenPose通信,控制机器人转,使得Avatar尽可能到达相机正中间
+		imwrite(PoseDir + "/Img.png", Img);
+		string Path = PoseDir + "/ManCenter.txt";
+		ifstream File;
 		File.open(&(Path[0]));
-	}
-	int X, Y;
-	File >> X >> Y;
-	File.close();
-	
-	//控制器
-	double w = 0;
-	{
-		int W = width;
-		double e = W / 2 - X;
-		if (abs(e) < eTheld || X == 0 || Y == 0)
+		while (!File.is_open())
 		{
-			w = 0;
+			File.open(&(Path[0]));
 		}
-		else
-		{
-			w = Kw*e;
-		}
-	}
-	//发布角速度
-	{
-		geometry_msgs::Twist twist;
-		twist.linear.x = 0.0;
-		twist.linear.y = 0.0;
-		twist.linear.z = 0.0;
-		twist.angular.x = 0.0;
-		twist.angular.y = 0.0;
-		twist.angular.z = w;
-		pub_base_twist.publish(twist);
-	}
+		int X, Y;
+		File >> X >> Y;
+		File.close();
 
-	//头部俯仰控制器
-	double pitch = 0;
-	double pitch_max = 0.523;
-	double pitch_min = -1.57;
-	{
-		int H = height;
-		double e = H / 4 - Y;
-		if (abs(e) < hTheld || X == 0 || Y == 0)
+		//控制器
+		double w = 0;
 		{
-			pitch = PrePitch;
+			int W = width;
+			double e = W / 2 - X;
+			if (abs(e) < eTheld || X == 0 || Y == 0)
+			{
+				w = 0;
+			}
+			else
+			{
+				w = Kw*e;
+			}
 		}
-		else
+		//发布角速度
 		{
-			pitch = Kh*e+PrePitch;
+			geometry_msgs::Twist twist;
+			twist.linear.x = 0.0;
+			twist.linear.y = 0.0;
+			twist.linear.z = 0.0;
+			twist.angular.x = 0.0;
+			twist.angular.y = 0.0;
+			twist.angular.z = w;
+			pub_base_twist.publish(twist);
 		}
-		if (pitch > pitch_max)pitch = pitch_max;
-		if (pitch < pitch_min)pitch = pitch_min;
+
+		//头部俯仰控制器
+		double pitch = 0;
+		double pitch_max = 0.523;
+		double pitch_min = -1.57;
+		{
+			int H = height;
+			double e = H / 4 - Y;
+			if (abs(e) < hTheld || X == 0 || Y == 0)
+			{
+				pitch = PrePitch;
+			}
+			else
+			{
+				pitch = Kh*e+PrePitch;
+			}
+			if (pitch > pitch_max)pitch = pitch_max;
+			if (pitch < pitch_min)pitch = pitch_min;
+		}
+		//发布关节位置
+		{
+			//pitchHead(pub_head_trajectory, "head_tilt_joint", pitch, 0);
+			PrePitch=pitch;
+		}
+		printf("X=%d,Y=%d,w=%.17g\n",X,Y,w);
 	}
-	//发布关节位置
-	{
-		//pitchHead(pub_head_trajectory, "head_tilt_joint", pitch, 0);
-		PrePitch=pitch;
-	}
-	printf("X=%d,Y=%d,w=%.17g\n",X,Y,w);
 }
 
 int main(int argc, char **argv)
@@ -149,6 +166,8 @@ int main(int argc, char **argv)
 	sub_Img = nh.subscribe("/hsrb/head_rgbd_sensor/rgb/image_raw", 1, imageCallback);
 	pub_base_twist = nh.advertise<geometry_msgs::Twist>("/hsrb/opt_command_velocity", 1);
 	pub_head_trajectory = nh.advertise<trajectory_msgs::JointTrajectory>("/hsrb/head_trajectory_controller/command", 1);
+	switch_sub = nh.subscribe("/followAvatar_switch", 1,switchCallback);
+	step_pub = nh.advertise<std_msgs::String>("/task_control", 1);
 
 
 

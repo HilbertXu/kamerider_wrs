@@ -260,3 +260,18 @@ add_executable(write_xml src/write_xml.cpp)
 add_dependencies(write_xml ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(write_xml ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
+add_executable(DOFmove src/DOFmove.cpp)
+add_dependencies(DOFmove ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(DOFmove ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(DOFmove_AutoGcpDcp src/DOFmove_AutoGcpDcp.cpp)
+add_dependencies(DOFmove_AutoGcpDcp ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(DOFmove_AutoGcpDcp ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(LookObjPtsInImg src/LookObjPtsInImg.cpp)
+add_dependencies(LookObjPtsInImg ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(LookObjPtsInImg ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(find_graspable_object src/find_graspable_object.cpp)
+add_dependencies(find_graspable_object ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(find_graspable_object ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})

@@ -9,6 +9,8 @@ using namespace std;
 using namespace cv;
 
 string xml_dir = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/json_files/pick_it_up_hand_right.xml";
+string map_dir = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/maps";
+
 
 vector<double> convertMat2Vector(const Mat &mat)
 {
@@ -17,6 +19,7 @@ vector<double> convertMat2Vector(const Mat &mat)
 
 int main()
 {
+	
 	std::vector<double> Data_;
 	int cols,rows;
 	cv::FileStorage xml(xml_dir, FileStorage::READ);
@@ -40,5 +43,9 @@ int main()
 		cout<<p[i]<<" ";
 		Data_test.push_back(double(p[i]));
 	}
+	xml.release();
+	
+
+
 
 }

@@ -68,6 +68,7 @@ ros::Publisher pcl_pub;//点云转到map坐标系下坐标后的发布器
 ros::Publisher TargetPos_pub;//发布最终结果
 ros::Publisher openpose_pub;
 ros::Publisher nav_pub;
+ros::Publisher step_pub;
 
 string SaveFileName;//初始加载xml路径
 Mat M_U_T;//Unity坐标系在Map坐标系下的描述
@@ -119,9 +120,6 @@ void CalculateQuaternion(float w_x, float w_y, float w_z,
 	int x1 = w_x; int y1 = w_y;
 	int x2 = i_x; int y2 = i_y;
 	int z1 = 0  ; int z2 = 0  ;
-
-
-
 }
 
 //四舍五入函数
@@ -143,7 +141,7 @@ int FindNearValid(char Choice,int Idx)
 		pclPt=&Cloud_Clean;
 	}
 	if(pclPt==NULL)return 0;
-	
+
 	int Crow=Idx/ImgWidth;
 	int Ccol=Idx%ImgWidth;
 	double TmpMin=VeryBig;
@@ -168,7 +166,7 @@ int FindNearValid(char Choice,int Idx)
 	return returnIdx;
 }
 
-void writeNavXml(string &fullPath, double p_x, double p_y, double p_z, 
+void writeNavXml(string &fullPath, double p_x, double p_y, double p_z,
 								   double o_x, double o_y, double o_z,
 								   int xml_flag)
 {
@@ -250,11 +248,11 @@ void ReadModelsXml(string&SaveFileName,Mat&M_Pos_Furniture,vector<string>&Furnit
 	FileStorage xmlFile(SaveFileName, FileStorage::READ);
 
 
-	
+
 	//读取家具位置个数
 	int N_Furniture;
 	xmlFile["M_Pos_Furniture"]["rows"]>>N_Furniture;
-	
+
 	//读取Furniture位置的名字
 	for(int i=1;i<=N_Furniture;i++)
 	{
@@ -263,7 +261,7 @@ void ReadModelsXml(string&SaveFileName,Mat&M_Pos_Furniture,vector<string>&Furnit
 		xmlFile[Buffer]>>TmpStr;
 		Furniture_Names.push_back(TmpStr);
 	}
-	
+
 	//读取Furniture位置,每行三个坐标行向量
 	M_Pos_Furniture=Mat::zeros(N_Furniture,9,CV_64F);
 	xmlFile["M_Pos_Furniture"] >> M_Pos_Furniture;
@@ -334,7 +332,7 @@ void ReadJsonKeypoints(char*FullPath,vector<int>&DataNums,vector<double>&Data,
 				}
 			}
 			DataNums_R.push_back(Nums);
-		}		
+		}
 	}while(Json.peek() != EOF);
 }
 //读取OpenPose写出的xml信息
@@ -370,7 +368,7 @@ void ReadXmlKeypoints(char*PoseXmlPath,char*RhandXmlPath,char*LhandXmlPath,
 			Data_R.push_back(double(p[i]));
 		}
 	}
-	
+
 	{
 		FileStorage LhandXmlFile(LhandXmlPath, FileStorage::READ);
 		int rows,cols;
@@ -385,7 +383,7 @@ void ReadXmlKeypoints(char*PoseXmlPath,char*RhandXmlPath,char*LhandXmlPath,
 			Data_L.push_back(double(p[i]));
 		}
 	}
-	
+
 	// printf("PoseXmlPath=%s\n",PoseXmlPath);
 	// for(int i=0;i<Data.size();i+=3)
 	// {
@@ -437,7 +435,7 @@ Mat ComputePto(double Wx,double Wy,double Wz,
 			Cx=pM_Pos_Furniture[i*M_Pos_Furniture.cols+6];
 			Cy=pM_Pos_Furniture[i*M_Pos_Furniture.cols+7];
 			Cz=pM_Pos_Furniture[i*M_Pos_Furniture.cols+8];
-			
+
 			p[0]=Bx-Wx;p[1]=Cx-Bx;p[2]=Ax-Bx;
 			p[3]=By-Wy;p[4]=Cy-By;p[5]=Ay-By;
 			p[6]=Bz-Wz;p[7]=Cz-Bz;p[8]=Az-Bz;
@@ -447,7 +445,7 @@ Mat ComputePto(double Wx,double Wy,double Wz,
 		double k=p[0];
 		double u=p[1]/p[0];
 		double v=p[2]/p[0];
-		
+
 		pResult[i*Result.cols]=k;
 		pResult[i*Result.cols+1]=u;
 		pResult[i*Result.cols+2]=v;
@@ -456,7 +454,7 @@ Mat ComputePto(double Wx,double Wy,double Wz,
 		pResult[i*Result.cols+5]=By+u*(Cy-By)+v*(Ay-By);
 		pResult[i*Result.cols+6]=Bz+u*(Cz-Bz)+v*(Az-Bz);
 	}
-	
+
 	double Gx,Gy,Gz=0;
 	double k=(Gz-Wz)/(Fz-Wz);//==(Gy-Wy)/(Fy-Wy)==(Gx-Wx)/(Fx-Wx)
 	Gx=k*(Fx-Wx)+Wx;
@@ -464,7 +462,7 @@ Mat ComputePto(double Wx,double Wy,double Wz,
 	pResult[i*Result.cols+3]=1;
 	pResult[i*Result.cols+4]=Gx;
 	pResult[i*Result.cols+5]=Gy;
-	
+
 	return Result;
 }
 
@@ -508,7 +506,7 @@ void DealJson()
 		// Json1.open(&(Json1_Path[0]));
 		// Json2.open(&(Json2_Path[0]));
 	// }
-	
+
 	string xml_1=json_dir + "/pick_it_up_pose.xml";
 	string xml_2=json_dir + "/pick_it_up_hand_right.xml";
 	string xml_3=json_dir + "/pick_it_up_hand_left.xml";
@@ -522,7 +520,7 @@ void DealJson()
 	ifstream Xml_4; Xml_4.open(&(xml_4[0]));
 	ifstream Xml_5; Xml_5.open(&(xml_5[0]));
 	ifstream Xml_6; Xml_6.open(&(xml_6[0]));
-	
+
 	while (!(Xml_1.is_open() &&
 			Xml_2.is_open() &&
 			Xml_3.is_open() &&
@@ -568,7 +566,7 @@ void DealJson()
 		vector<int>DataNums_R;
 		vector<double>Data_R;
 		//ReadJsonKeypoints(Buffer, DataNums, Data, DataNums_L, Data_L, DataNums_R, Data_R);
-		
+
 		char PoseXmlPath[MAX_PATH];sprintf(PoseXmlPath, "%s/pick_it_up_pose.xml", &(json_dir[0]));
 		char RhandXmlPath[MAX_PATH];sprintf(RhandXmlPath, "%s/pick_it_up_hand_right.xml", &(json_dir[0]));
 		char LhandXmlPath[MAX_PATH];sprintf(LhandXmlPath, "%s/pick_it_up_hand_left.xml", &(json_dir[0]));
@@ -578,7 +576,7 @@ void DealJson()
 			//测试专用
 			int StartIdx;
 			cout << "\n\n\nPick_it_up!:\n__________________________________________" << endl;
-			
+
 			cout << "Pose Keypoints:" << endl;
 			StartIdx = 0;
 			for (int i = 0; i<DataNums.size(); i++)
@@ -590,7 +588,7 @@ void DealJson()
 				cout << "\n";
 				StartIdx = StartIdx + DataNums[i];
 			}
-			
+
 			cout << "Left Hand Keypoints:" << endl;
 			StartIdx = 0;
 			for (int i = 0; i<DataNums_L.size(); i++)
@@ -602,7 +600,7 @@ void DealJson()
 				cout << "\n";
 				StartIdx = StartIdx + DataNums_L[i];
 			}
-			
+
 			cout << "Right Hand Keypoints:" << endl;
 			StartIdx = 0;
 			for (int i = 0; i<DataNums_R.size(); i++)
@@ -661,7 +659,7 @@ void DealJson()
 		double Hip_x = Cloud_Pick.points[Hip_Idxs].x;
 		double Hip_y = Cloud_Pick.points[Hip_Idxs].y;
 		double Hip_z = Cloud_Pick.points[Hip_Idxs].z;
-		
+
 		if(isnan(M_x)||isnan(M_y)||isnan(M_z))
 		{
 			Mark_Idxs[0]=FindNearValid('p',Mark_Idxs[0]);
@@ -704,8 +702,8 @@ void DealJson()
 			Hip_y = Cloud_Pick.points[Hip_Idxs].y;
 			Hip_z = Cloud_Pick.points[Hip_Idxs].z;
 		}
-		
-		
+
+
 		/*{
 			printf("%d\n%d\n%d\n%d\n%d\n", Mark_Idxs[0], Mark_Idxs[1], Mark_Idxs[2], Mark_Idxs[3], Mark_Idxs[4]);
 			//调试专用
@@ -775,7 +773,7 @@ void DealJson()
 				cout << "\n";
 				StartIdx = StartIdx + DataNums[i];
 			}
-			
+
 			cout << "Left Hand Keypoints:" << endl;
 			StartIdx = 0;
 			for (int i = 0; i<DataNums_L.size(); i++)
@@ -787,7 +785,7 @@ void DealJson()
 				cout << "\n";
 				StartIdx = StartIdx + DataNums_L[i];
 			}
-			
+
 			cout << "Right Hand Keypoints:" << endl;
 			StartIdx = 0;
 			for (int i = 0; i<DataNums_R.size(); i++)
@@ -812,9 +810,9 @@ void DealJson()
 			pU_Pos_DCP_[i + U_Pos_DCP.rows] = pU_Pos_DCP[i * 3 + 1];
 			pU_Pos_DCP_[i + U_Pos_DCP.rows * 2] = pU_Pos_DCP[i * 3 + 2];
 		}
-		
-		
-		
+
+
+
 		double*pM_Pos_DCP_ = (double*)(M_Pos_DCP_.data);//4行若干列
 
 														//当前使用起点为手腕,终点为食指第二指节构造射线
@@ -849,7 +847,7 @@ void DealJson()
 		double Hip_x = Cloud_Clean.points[Hip_Idxs].x;
 		double Hip_y = Cloud_Clean.points[Hip_Idxs].y;
 		double Hip_z = Cloud_Clean.points[Hip_Idxs].z;
-		
+
 		if(isnan(M_x)||isnan(M_y)||isnan(M_z))
 		{
 			Mark_Idxs[0]=FindNearValid('c',Mark_Idxs[0]);
@@ -905,7 +903,7 @@ void DealJson()
 		{
 			cout << "Avatar used left hand" << endl;
 			cout << "This is all dis:\n";
-			
+
 			for (int i = 0; i < DCP_Names.size(); i++)
 			{
 				double DCP_i_x = pM_Pos_DCP_[i];
@@ -921,7 +919,7 @@ void DealJson()
 				cout << Dis[i] << " ";
 			}
 			cout << "\n";
-			
+
 			Mat Res=ComputePto(Lw_x,Lw_y,Lw_z,Li_x,Li_y,Li_z);
 			PrintMat(Res,"DCP_Res");
 			//writeNavXml();
@@ -946,7 +944,7 @@ void DealJson()
 				//cout << DCP_i_x << " " << DCP_i_y << " " << DCP_i_z << endl;//调试专用
 			}
 			cout << "\n";
-			
+
 			Mat Res=ComputePto(Rw_x,Rw_y,Rw_z,Ri_x,Ri_y,Ri_z);
 			PrintMat(Res,"DCP_Res");
 			//writeNavXml();
@@ -963,6 +961,9 @@ void DealJson()
 		std_msgs::String str;
 		str.data = "start";
 		nav_pub.publish(str);
+		//communicate with control node
+		std.data = "OPAros_end";
+		step_pub.publish(str);
 	}
 }
 
@@ -1002,7 +1003,7 @@ void imageCallback(sensor_msgs::Image msg)
 			imwrite(Buffer,Img);
 			Img_Clean = Img.clone();
 		}
-		
+
 		if(DealJson_FunNum==0&&!Img_Clean.empty()&&!Cloud_Clean.empty())
 		{
 			//start openpose
@@ -1039,14 +1040,14 @@ void PcloudCallback(sensor_msgs::PointCloud2 msg)
 	{
 		pListener->lookupTransform("/map", "head_rgbd_sensor_depth_frame",ros::Time(0), CurrTf);
 	}
-	catch (tf::TransformException &ex) 
+	catch (tf::TransformException &ex)
 	{
 		ROS_ERROR("%s",ex.what());
 		ros::Duration(1.0).sleep();
 	}
 	tf::Vector3 P=CurrTf.getOrigin();
 	tf::Matrix3x3 R=CurrTf.getBasis();
-	
+
 	//pcl::PointCloud<pcl::PointXYZ> cloud;
     pcl::PointCloud<pcl::PointXYZRGB> cloud;//——————————————————————————————————————————————额外添加
     sensor_msgs::PointCloud2 oMsg;
@@ -1073,24 +1074,24 @@ void PcloudCallback(sensor_msgs::PointCloud2 msg)
 		floatBuffer[2]=msg.data[i*16+2];
 		floatBuffer[3]=msg.data[i*16+3];
 		double X=*((float*)floatBuffer);
-		
+
 		floatBuffer[0]=msg.data[i*16+4];
 		floatBuffer[1]=msg.data[i*16+5];
 		floatBuffer[2]=msg.data[i*16+6];
 		floatBuffer[3]=msg.data[i*16+7];
 		double Y=*((float*)floatBuffer);
-		
+
 		floatBuffer[0]=msg.data[i*16+8];
 		floatBuffer[1]=msg.data[i*16+9];
 		floatBuffer[2]=msg.data[i*16+10];
 		floatBuffer[3]=msg.data[i*16+11];
 		double Z=*((float*)floatBuffer);
-		
+
 		//利用坐标变换将点云坐标变到map坐标系下描述
         cloud.points[i].x = R[0][0]*X+R[0][1]*Y+R[0][2]*Z+P[0];
         cloud.points[i].y = R[1][0]*X+R[1][1]*Y+R[1][2]*Z+P[1];
         cloud.points[i].z = R[2][0]*X+R[2][1]*Y+R[2][2]*Z+P[2];
-		
+
 		//合成三维RGB点云
 		cloud.points[i].r = Img_Frame.data[i*3+2];//——————————————————————————————————————————————额外添加
 		cloud.points[i].g = Img_Frame.data[i*3+1];//——————————————————————————————————————————————额外添加
@@ -1115,7 +1116,7 @@ void PcloudCallback(sensor_msgs::PointCloud2 msg)
 	pcl::toROSMsg(cloud, oMsg);
 	oMsg.header.frame_id = "map";
 	pcl_pub.publish(oMsg);
-	
+
 	if(PtsIsSave)
 	{
 		//sprintf(Buffer,"%s/%d.txt",&(SaveDir[0]),StaticNum);
@@ -1127,19 +1128,19 @@ void PcloudCallback(sensor_msgs::PointCloud2 msg)
 		//	floatBuffer[2]=msg.data[i+2];
 		//	floatBuffer[3]=msg.data[i+3];
 		//	double X=*((float*)floatBuffer);
-		//	
+		//
 		//	floatBuffer[0]=msg.data[i+4];
 		//	floatBuffer[1]=msg.data[i+5];
 		//	floatBuffer[2]=msg.data[i+6];
 		//	floatBuffer[3]=msg.data[i+7];
 		//	double Y=*((float*)floatBuffer);
-		//	
+		//
 		//	floatBuffer[0]=msg.data[i+8];
 		//	floatBuffer[1]=msg.data[i+9];
 		//	floatBuffer[2]=msg.data[i+10];
 		//	floatBuffer[3]=msg.data[i+11];
 		//	double Z=*((float*)floatBuffer);
-		//	
+		//
 		//	sprintf(Buffer,"%.17g\t%.17g\t%.17g\n",X,Y,Z);
 		//	Txt<<Buffer;
 		//}
@@ -1172,11 +1173,19 @@ void CleanupMsgCallback(interactive_cleanup::InteractiveCleanupMsg msg)
 		PtsStaticNum++;
 		PngStaticNum++;
 	}
+	if(msg.message == "Are_you_ready?")
+	{
+		std::cout <<"SAY I AM READY" << endl;
+		interactive_cleanup::InteractiveCleanupMsg interactive_cleanup_msg;
+    	interactive_cleanup_msg.message = "I_am_ready";
+		Avatar_pub.publish(interactive_cleanup_msg);
+		ROS_INFO("TASK START");
+	}
 }
 
 
 int main(int argc, char **argv)
-{	
+{
 	ReadModelsXml(xml_dir,M_Pos_Furniture,Furniture_Names);//读取xml文件
 	int N_DCP=Furniture_Names.size()-1;//前多少个是DCP的家具
 	M_Pos_DCP_=Mat::ones(4,N_DCP,CV_64F);//每一列都是xyz1
@@ -1189,7 +1198,7 @@ int main(int argc, char **argv)
 		pM_Pos_DCP_[1*M_Pos_DCP_.cols+i]=(pM_Pos_Furniture[i*M_Pos_Furniture.cols+1]+pM_Pos_Furniture[i*M_Pos_Furniture.cols+7])/2;
 		pM_Pos_DCP_[2*M_Pos_DCP_.cols+i]=(pM_Pos_Furniture[i*M_Pos_Furniture.cols+2]+pM_Pos_Furniture[i*M_Pos_Furniture.cols+8])/2;
 	}
-	
+
 	ros::init(argc, argv, "ListenerKingNew_Xml");
 
 	ros::NodeHandle n;
@@ -1202,6 +1211,7 @@ int main(int argc, char **argv)
 	TargetPos_pub   = n.advertise<std_msgs::String>("TargetPosName", 1);
 	openpose_pub    = n.advertise<std_msgs::String>("/start_openpose", 1);
 	nav_pub         = n.advertise<std_msgs::String>("/OPAros2nav", 1);
+	step_pub        = n.advertise<std_msgs::String>("/task_control", 1);
 
 	tf::TransformListener Listener;
 	pListener = &Listener;

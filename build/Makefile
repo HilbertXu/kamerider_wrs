@@ -283,6 +283,32 @@ gtest_main/fast:
 .PHONY : gtest_main/fast
 
 #=============================================================================
+# Target rules for targets named find_graspable_object
+
+# Build rule for target.
+find_graspable_object: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 find_graspable_object
+.PHONY : find_graspable_object
+
+# fast build rule for target.
+find_graspable_object/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/find_graspable_object.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/find_graspable_object.dir/build
+.PHONY : find_graspable_object/fast
+
+#=============================================================================
+# Target rules for targets named DOFmove
+
+# Build rule for target.
+DOFmove: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 DOFmove
+.PHONY : DOFmove
+
+# fast build rule for target.
+DOFmove/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove.dir/build
+.PHONY : DOFmove/fast
+
+#=============================================================================
 # Target rules for targets named write_xml
 
 # Build rule for target.
@@ -894,6 +920,19 @@ trajectory_msgs_generate_messages_cpp/fast:
 .PHONY : trajectory_msgs_generate_messages_cpp/fast
 
 #=============================================================================
+# Target rules for targets named DOFmove_AutoGcpDcp
+
+# Build rule for target.
+DOFmove_AutoGcpDcp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 DOFmove_AutoGcpDcp
+.PHONY : DOFmove_AutoGcpDcp
+
+# fast build rule for target.
+DOFmove_AutoGcpDcp/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/build
+.PHONY : DOFmove_AutoGcpDcp/fast
+
+#=============================================================================
 # Target rules for targets named roscpp_generate_messages_eus
 
 # Build rule for target.
@@ -1295,6 +1334,19 @@ nav_msgs_generate_messages_cpp: cmake_check_build_system
 nav_msgs_generate_messages_cpp/fast:
 	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/nav_msgs_generate_messages_cpp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/nav_msgs_generate_messages_cpp.dir/build
 .PHONY : nav_msgs_generate_messages_cpp/fast
+
+#=============================================================================
+# Target rules for targets named LookObjPtsInImg
+
+# Build rule for target.
+LookObjPtsInImg: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 LookObjPtsInImg
+.PHONY : LookObjPtsInImg
+
+# fast build rule for target.
+LookObjPtsInImg/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/LookObjPtsInImg.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/LookObjPtsInImg.dir/build
+.PHONY : LookObjPtsInImg/fast
 
 #=============================================================================
 # Target rules for targets named pcl_ros_gencfg
@@ -2163,6 +2215,8 @@ help:
 	@echo "... gmock_main"
 	@echo "... gtest"
 	@echo "... gtest_main"
+	@echo "... find_graspable_object"
+	@echo "... DOFmove"
 	@echo "... write_xml"
 	@echo "... cleanup_navigation"
 	@echo "... pcl"
@@ -2210,6 +2264,7 @@ help:
 	@echo "... sensor_msgs_generate_messages_nodejs"
 	@echo "... geometry_msgs_generate_messages_cpp"
 	@echo "... trajectory_msgs_generate_messages_cpp"
+	@echo "... DOFmove_AutoGcpDcp"
 	@echo "... roscpp_generate_messages_eus"
 	@echo "... bond_generate_messages_eus"
 	@echo "... interactive_cleanup_genlisp"
@@ -2241,6 +2296,7 @@ help:
 	@echo "... tf2_msgs_generate_messages_nodejs"
 	@echo "... tf2_msgs_generate_messages_lisp"
 	@echo "... nav_msgs_generate_messages_cpp"
+	@echo "... LookObjPtsInImg"
 	@echo "... pcl_ros_gencfg"
 	@echo "... tf2_msgs_generate_messages_eus"
 	@echo "... nav_msgs_generate_messages_eus"

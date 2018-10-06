@@ -54,6 +54,20 @@ void reset()
 	nav_flag.data = "";
 }
 
+void printNavXml(geometry_msgs::Pose nav_pose)
+{
+	cout << "the navigation position is: " << endl;
+	float p_x = nav_pose.position.x; cout << p_x << endl;
+	float p_y = nav_pose.position.y; cout << p_y << endl;
+	float p_z = nav_pose.position.z; cout << p_z << endl;
+
+	cout << "the navigation orientation is: " << endl;
+	float o_x = nav_pose.orientation.x; cout << o_x << endl;
+	float o_y = nav_pose.orientation.y; cout << o_y << endl;
+	float o_z = nav_pose.orientation.z; cout << o_z << endl;
+	float o_w = nav_pose.orientation.w; cout << o_w << endl;
+}
+
 void readXmlFiles(string &dir)
 {
 	ROS_INFO("start reading position xml files");
@@ -67,6 +81,7 @@ void readXmlFiles(string &dir)
 	GCP_Pose.orientation.y = GCP_xml["orientation"]["y"];
 	GCP_Pose.orientation.z = GCP_xml["orientation"]["z"];
 	GCP_Pose.orientation.w = GCP_xml["orientation"]["w"];
+	printNavXml(GCP_Pose);
 	GCP_xml.release();
 
 	string DCP_Path = dir + "/DCP_Nav_Pos.xml";
@@ -79,6 +94,7 @@ void readXmlFiles(string &dir)
 	DCP_Pose.orientation.y = DCP_xml["orientation"]["y"];
 	DCP_Pose.orientation.z = DCP_xml["orientation"]["z"];
 	DCP_Pose.orientation.w = DCP_xml["orientation"]["w"];
+	printNavXml(DCP_Pose);
 	DCP_xml.release();
 
 	ifNavigate = true;
