@@ -68,7 +68,7 @@
 		<param name="PoseDir"                           type="string" value="$(arg PoseDir)"/>
         </node>
 
-        <node name = "OPArosNew_Xmlt" pkg = "interactive_cleanup" type = "OPArosNew_Xml" output = "screen" launch-prefix = "gnome-terminal -x">
+        <node name = "OPArosNew_Xml" pkg = "interactive_cleanup" type = "OPArosNew_Xml" output = "screen" launch-prefix = "gnome-terminal -x">
         </node>
 
         <node name = "openpose_ros"     pkg = "openpose_ros"        type = "openpose_ros.py"     output = "screen" launch-prefix = "gnome-terminal -x"> 
