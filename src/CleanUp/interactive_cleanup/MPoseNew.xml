@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<opencv_storage>
+	<!-- Pick_it_up! Possible Pos -->
+	<N_GCP>19</N_GCP>
+	
+	<GCP_Name_1>"GraspingCandidatesPosition01"</GCP_Name_1>
+	<GCP_Name_2>"GraspingCandidatesPosition02"</GCP_Name_2>
+	<GCP_Name_3>"GraspingCandidatesPosition03"</GCP_Name_3>
+	<GCP_Name_4>"GraspingCandidatesPosition04"</GCP_Name_4>
+	<GCP_Name_5>"GraspingCandidatesPosition05"</GCP_Name_5>
+	<GCP_Name_6>"GraspingCandidatesPosition06"</GCP_Name_6>
+	<GCP_Name_7>"GraspingCandidatesPosition07"</GCP_Name_7>
+	<GCP_Name_8>"GraspingCandidatesPosition08"</GCP_Name_8>
+	<GCP_Name_9>"GraspingCandidatesPosition09"</GCP_Name_9>
+	<GCP_Name_10>"GraspingCandidatesPosition10"</GCP_Name_10>
+	<GCP_Name_11>"GraspingCandidatesPosition11"</GCP_Name_11>
+	<GCP_Name_12>"GraspingCandidatesPosition12"</GCP_Name_12>
+	<GCP_Name_13>"GraspingCandidatesPosition13"</GCP_Name_13>
+	<GCP_Name_14>"GraspingCandidatesPosition14"</GCP_Name_14>
+	<GCP_Name_15>"GraspingCandidatesPosition15"</GCP_Name_15>
+	<GCP_Name_16>"GraspingCandidatesPosition16"</GCP_Name_16>
+	<GCP_Name_17>"GraspingCandidatesPosition17"</GCP_Name_17>
+	<GCP_Name_18>"GraspingCandidatesPosition18"</GCP_Name_18>
+	<GCP_Name_19>"GraspingCandidatesPosition19"</GCP_Name_19>
+
+	<M_Pos_GCP type_id="opencv-matrix">
+		<rows>19</rows>
+		<cols>3</cols>
+		<dt>d</dt>
+		<data>
+			 4.358                     3.854                     0.775
+			4.8977                      1.66                      1.09
+			4.9041                     1.918                     0.369
+			 4.619                    -0.192                     0.545
+			4.6213                    -1.146                     0.545
+			 1.741                    -2.143                     0.545
+			 0.588                    -2.143                     0.545
+			 2.337                    3.0963                     0.775
+			 0.124                     3.028                    0.4928
+			  0.64                      3.41                    0.4928
+				 4                      2.64                      0.05
+			   4.1                      0.78                      0.05
+			  3.67                     -1.17                      0.05
+			  1.21                     -1.49                      0.05
+			 -0.89                     -1.49                      0.05
+			 -0.67                      1.62                      0.05
+			  1.37                      1.02                      0.05
+			  1.15                      2.44                      0.05
+			 -0.97                      4.24                      0.05
+		</data>
+	</M_Pos_GCP>
+</opencv_storage>

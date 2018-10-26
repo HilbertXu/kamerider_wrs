@@ -9,8 +9,6 @@
 #include <cmath>
 #include <cstring>
 #include <csignal>
-#include <unistd.h>
-#include <termios.h>
 #include <chrono>
 
 #include <ros/ros.h>
@@ -44,9 +42,10 @@ pcl::PointCloud<pcl::PointXYZ> Cloud_BFrame;//存储每一帧头部传感器点�
 const int ImgWidth = 640;//头部传感器拍摄到的RGB图片宽度
 const int ImgHeight = 480;//头部传感器拍摄到的RGB图片高度
 
-bool ifArrivedGCP         = false;
-bool ifArrivedDCP         = false;
+bool ifArrivedGCP         = true;
+bool ifArrivedDCP         = true;
 bool ifReceivedDarknet    = false;
+bool ifPCLsaved           = false;
 
 vector<double>JointPos;//各关节在关节空间中位置
 
@@ -90,7 +89,7 @@ const int MAX_OBJECTS_NUM = 3;
 
 int center_x[MAX_OBJECTS_NUM];
 int center_y[MAX_OBJECTS_NUM];
-int idx[MAX_OBJECTS_NUM];
+int idx[MAX_OBJECTS_NUM] = {0,0,0};
 
 //四舍五入函数
 double round(double r)
@@ -101,21 +100,54 @@ double round(double r)
 void reset()
 {
 	latest_time_of_point_cloud_    = system_clock::now();
-	latest_time_of_bounding_boxes_ = system_clock::now(); 
+	latest_time_of_bounding_boxes_ = system_clock::now();
 	bounding_boxes_data_.boundingBoxes.reserve(MAX_OBJECTS_NUM);
 }
 
 void readNavXml()
 {
+	cout << "reading xml" <<endl;
 	cv::FileStorage GCP_xml(xml_dir, cv::FileStorage::READ);
 	pos_x = GCP_xml["position"]["x"];
 	pos_y = GCP_xml["position"]["y"];
 	pos_z = GCP_xml["position"]["z"];
+	cout << "finish reading " << endl;
+}
+
+void setMiniDis()
+{
+	cout << "Trying to find the Shortest path to Steins Gate" << endl;
+	for(int i =0; i<data_count; i++)
+	{
+		int center_x = round((bounding_boxes_data_.boundingBoxes[i].xmin + bounding_boxes_data_.boundingBoxes[i].xmax)/2);
+		int center_y = round((bounding_boxes_data_.boundingBoxes[i].ymin + bounding_boxes_data_.boundingBoxes[i].ymax)/2);
+		idx[i] = center_x + center_y * ImgWidth;
+		cout << idx[i] << " ";
+		pcl_x = Cloud_Frame.points[idx[i]].x;
+		pcl_y = Cloud_Frame.points[idx[i]].y;
+		pcl_z = Cloud_Frame.points[idx[i]].z;
+		curr_distance = pow((pcl_x - pos_x), 2) + pow((pcl_y - pos_y), 2) + pow((pcl_z - pcl_z), 2);
+		if(mini_distance > curr_distance)
+		{
+			mini_distance = curr_distance;
+			num = i;
+		}
+		cout << "We chose the number " << num << "point" << endl;
+	}
+	float tmp_x, tmp_y, tmp_z;
+	std_msgs::Float64MultiArray msg;
+	msg.data.push_back(Cloud_BFrame.points[num].x); tmp_x = Cloud_BFrame.points[num].x;
+	msg.data.push_back(Cloud_BFrame.points[num].y); tmp_y = Cloud_BFrame.points[num].y;
+	msg.data.push_back(Cloud_BFrame.points[num].z); tmp_z = Cloud_BFrame.points[num].z;
+	cout << tmp_x << " " << tmp_y << " " << tmp_z << endl;
+	bOBJpos_pub.publish(msg);
+
 }
 
 void darknetCallback(const darknet_ros_msgs::BoundingBoxes::ConstPtr& msg)
 {
-
+	std::cout << "receiving bounding boxes" << endl;
+	ifReceivedDarknet = true;
 	data_count = std::min<int>(msg->boundingBoxes.size(), MAX_OBJECTS_NUM);
 	bounding_boxes_data_.boundingBoxes.resize(data_count);
 
@@ -129,7 +161,8 @@ void darknetCallback(const darknet_ros_msgs::BoundingBoxes::ConstPtr& msg)
 		bounding_boxes_data_.boundingBoxes[i].ymax        = msg->boundingBoxes[i].ymax;
 		center_x[i] = (bounding_boxes_data_.boundingBoxes[i].xmin + bounding_boxes_data_.boundingBoxes[i].xmax)/2;
 		center_y[i] = (bounding_boxes_data_.boundingBoxes[i].ymin + bounding_boxes_data_.boundingBoxes[i].ymax)/2;
-	} 
+	}
+	setMiniDis();
 }
 
 void navCallback(const std_msgs::String::ConstPtr &msg)
@@ -142,10 +175,10 @@ void navCallback(const std_msgs::String::ConstPtr &msg)
 
 void pclCallback(sensor_msgs::PointCloud2 msg)
 {
+	std::cout << "Calculating PCL data and Transform Matrix" << endl;
 	try
 	{
 		pListener->lookupTransform("/map", "head_rgbd_sensor_depth_frame",ros::Time(0), CurrTf);
-		baseListener->lookupTransform("/base_link", "head_rgbd_sensor_depth_frame", ros::Time(0), sensor2base_link);
 	}
 	catch (tf::TransformException &ex)
 	{
@@ -153,22 +186,59 @@ void pclCallback(sensor_msgs::PointCloud2 msg)
 		ros::Duration(1.0).sleep();
 	}
 
-
+	try
+	{
+		pListener->lookupTransform("/base_link", "head_rgbd_sensor_depth_frame",ros::Time(0), sensor2base_link);
+	}
+	catch (tf::TransformException &ex)
+	{
+		ROS_ERROR("%s",ex.what());
+		ros::Duration(1.0).sleep();
+	}
 	tf::Vector3 P=CurrTf.getOrigin();
 	tf::Matrix3x3 R=CurrTf.getBasis();
+
+	std::cout << "transform matrix is: " << endl;
+	std::cout << P[1] << " " << P[2] << " " << P[3] << endl;
+	for(int i=0; i< 3; i++)
+	{
+		for(int j=0; j<3; j++)
+			std::cout << R[i][j] << " ";
+		std::cout << endl;
+	}
+	std::cout << endl;
 
 	tf::Vector3 W = sensor2base_link.getOrigin();
 	tf::Matrix3x3 Q = sensor2base_link.getBasis();
 
+	std::cout << "transform matrix is: " << endl;
+	std::cout << W[1] << " " << W[2] << " " << W[3] << endl;
+	for(int i=0; i< 3; i++)
+	{
+		for(int j=0; j<3; j++)
+			std::cout << Q[i][j] << " ";
+		std::cout << endl;
+	}
+	std::cout << endl;
+
+	pcl::PointCloud<pcl::PointXYZ> cloud;
 	sensor_msgs::PointCloud2 oMsg;
-	Cloud_Frame.width = msg.width;
-	Cloud_Frame.height = msg.height;
-	Cloud_Frame.points.resize(Cloud_Frame.width * Cloud_Frame.height);
+	cloud.width  = msg.width;
+    cloud.height = msg.height;
+    cloud.points.resize(cloud.width * cloud.height);
+	if(Cloud_Frame.empty())
+	{
+		Cloud_Frame.width = msg.width;
+		Cloud_Frame.height = msg.height;
+		Cloud_Frame.points.resize(Cloud_Frame.width * Cloud_Frame.height);
+	}
 
-	Cloud_BFrame.width = msg.width;
-	Cloud_BFrame.height = msg.height;
-	Cloud_BFrame.points.resize(Cloud_BFrame.width * Cloud_BFrame.height);
-
+	if(Cloud_BFrame.empty())
+	{
+		Cloud_BFrame.width = msg.width;
+		Cloud_BFrame.height = msg.height;
+		Cloud_BFrame.points.resize(Cloud_BFrame.width * Cloud_BFrame.height);
+	}
 	for(size_t i = 0; i < Cloud_Frame.size(); i++)
 	{
 		//把已有点云消息中的X,Y,Z提取出来
@@ -190,40 +260,29 @@ void pclCallback(sensor_msgs::PointCloud2 msg)
 		floatBuffer[3]=msg.data[i*16+11];
 		double Z=*((float*)floatBuffer);
 
-		//利用坐标变换将点云坐标变到map坐标系下描述
-        Cloud_Frame.points[i].x = R[0][0]*X+R[0][1]*Y+R[0][2]*Z+P[0];
-        Cloud_Frame.points[i].y = R[1][0]*X+R[1][1]*Y+R[1][2]*Z+P[1];
-        Cloud_Frame.points[i].z = R[2][0]*X+R[2][1]*Y+R[2][2]*Z+P[2];
+	cloud.points[i].x = R[0][0]*X+R[0][1]*Y+R[0][2]*Z+P[0];
+    cloud.points[i].y = R[1][0]*X+R[1][1]*Y+R[1][2]*Z+P[1];
+    cloud.points[i].z = R[2][0]*X+R[2][1]*Y+R[2][2]*Z+P[2];
 
-        Cloud_BFrame.points[i].x = Q[0][0]*X + Q[0][1]*Y + Q[0][2]*Z + W[0];
-        Cloud_BFrame.points[i].y = Q[1][0]*X + Q[1][1]*Y + Q[1][2]*Z + W[1];
-        Cloud_BFrame.points[i].z = Q[2][0]*X + Q[2][1]*Y + Q[2][2]*Z + W[2];
-	}
-}
+		float x, y, z;
+  Cloud_Frame.points[i].x = cloud.points[i].x; x = Cloud_Frame.points[i].x;
+  Cloud_Frame.points[i].y = cloud.points[i].y; y = Cloud_Frame.points[i].y;
+  Cloud_Frame.points[i].z = cloud.points[i].z; z = Cloud_Frame.points[i].z;
+		//cout << "temperory map frame PCL data is: " << x << " " << y << " " << z << endl;
 
-void setMiniDis()
-{
-	for(int i =0; i<data_count; i++)
-	{
-		int center_x = round((bounding_boxes_data_.boundingBoxes[i].xmin + bounding_boxes_data_.boundingBoxes[i].xmax)/2);
-		int center_y = round((bounding_boxes_data_.boundingBoxes[i].ymin + bounding_boxes_data_.boundingBoxes[i].ymax)/2);
-		idx[i] = center_x + center_y * ImgWidth;
-		pcl_x = Cloud_Frame.points[idx[i]].x;
-		pcl_y = Cloud_Frame.points[idx[i]].y;
-		pcl_z = Cloud_Frame.points[idx[i]].z;
-		curr_distance = pow((pcl_x - pos_x), 2) + pow((pcl_y - pos_y), 2) + pow((pcl_z - pcl_z), 2);
-		if(mini_distance > curr_distance)
-		{
-			mini_distance = curr_distance;
-			num = i;
+
+  Cloud_BFrame.points[i].x = Q[0][0]*X + Q[0][1]*Y + Q[0][2]*Z + W[0]; x = Cloud_BFrame.points[i].x;
+  Cloud_BFrame.points[i].y = Q[1][0]*X + Q[1][1]*Y + Q[1][2]*Z + W[1]; y = Cloud_BFrame.points[i].y;
+  Cloud_BFrame.points[i].z = Q[2][0]*X + Q[2][1]*Y + Q[2][2]*Z + W[2]; z = Cloud_BFrame.points[i].z;
+		//cout << "temperory base_link frame PCL data is: " << x << " " << y << " " << z << endl;
 		}
+		pcl::toROSMsg(cloud, oMsg);
+		oMsg.header.frame_id = "map";
+		pcl_pub.publish(oMsg);
 	}
-	std_msgs::Float64MultiArray msg;
-	msg.data.push_back(Cloud_BFrame.points[num].x);
-	msg.data.push_back(Cloud_BFrame.points[num].y);
-	msg.data.push_back(Cloud_BFrame.points[num].z);
-	bOBJpos_pub.publish(msg);
-}
+	
+
+
 
 int main(int argc, char **argv)
 {
@@ -231,18 +290,16 @@ int main(int argc, char **argv)
 	ros::NodeHandle nh;
 	ROS_INFO("reading position file");
 	readNavXml();
+	sub_PtCloud = nh.subscribe("/hsrb/head_rgbd_sensor/depth/points", 1, pclCallback);
 	sub_darknet = nh.subscribe("/darknet_ros/bounding_boxes", 1, darknetCallback);
 	bOBJpos_pub = nh.advertise<std_msgs::Float64MultiArray>("/bOBJgcp", 1);
 	nav_sub	    = nh.subscribe("/nav2obj", 1, navCallback);
+	string MpName=string("/")+InitName+"/map_points";
+	pcl_pub = nh.advertise<sensor_msgs::PointCloud2>(MpName, 1);
 
 	tf::TransformListener Listener;
 	pListener = &Listener;
 
-	tf::TransformListener BaseListener_;
-	baseListener = &BaseListener_;
-
+	ros::spin();
+	return 0;
 }
-
-
-
-

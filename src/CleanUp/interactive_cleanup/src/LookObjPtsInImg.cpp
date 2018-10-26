@@ -91,96 +91,36 @@ void SaveLook()
 		imwrite(Buffer,Img_Frame);
 		cout<<"\tSave in "<<Buffer<<"\n";
 		
-		sprintf(Buffer,"%s/Pose_inPos_%d.txt",&(LookSaveDir[0]),LookSaveNum);
-		cout<<"\tSave in "<<Buffer<<"\n";
-		{
-			try
-			{
-				pListener->lookupTransform("/map", &(base_link_Name[0]),ros::Time(0), CurrTf);
-			}
-			catch (tf::TransformException &ex) 
-			{
-				ROS_ERROR("%s",ex.what());
-				ros::Duration(1.0).sleep();
-			}
-			
-			{
-				ofstream File(Buffer);
-				tf::Vector3 P=CurrTf.getOrigin();
-				tf::Matrix3x3 R=CurrTf.getBasis();
-				sprintf(Buffer,"%.17g %.17g %.17g %.17g\n" \
-								"%.17g %.17g %.17g %.17g\n" \
-								"%.17g %.17g %.17g %.17g\n" \
-								"0 0 0 1",
-								R[0][0],R[0][1],R[0][2],P[0],
-								R[1][0],R[1][1],R[1][2],P[1],
-								R[2][0],R[2][1],R[2][2],P[2]);
-				File<<Buffer;
-				File.close();
-			}
-			
-			if(!JointPos.empty())
-			{
-				sprintf(Buffer,"%s/PoseStates.txt",&(LookSaveDir[0]));
-				ofstream File(Buffer,ios::app);
-				tf::Vector3 P=CurrTf.getOrigin();
-				tf::Matrix3x3 R=CurrTf.getBasis();
-				sprintf(Buffer,"%.17g %.17g %.17g",P[0],P[1],atan2(R[1][0],R[0][0]));
-				File<<Buffer;
-				int JointN=JointPos.size();
-				for(int i=0;i<JointN;i++)
-				{
-					sprintf(Buffer," %.17g",JointPos[i]);
-					File<<Buffer;
-				}
-				File<<"\n";
-				File.close();
-			}
-
-		}
 		
-		sprintf(Buffer,"%s/lookXYZRGB_inPos_%d.txt",&(LookSaveDir[0]),LookSaveNum);
-		cout<<"\tSave in "<<Buffer<<"\n";
-		{
-			ofstream File(Buffer);
-			int N=Cloud_Frame.points.size();
-			unsigned char*p=Img_Frame.data;
-			for(int i=0;i<N;i++)
-			{
-				sprintf(Buffer,"%.17g %.17g %.17g %d %d %d\n",
-								Cloud_Frame.points[i].x,
-								Cloud_Frame.points[i].y,
-								Cloud_Frame.points[i].z,
-								int(p[i*3+2]),int(p[i*3+1]),int(p[i*3]));
-				File<<Buffer;
-			}
-			File.close();
-		}
 		
-		sprintf(Buffer,"%s/lookXYZRGB_inPos_%d.txt.XYZRGB",&(LookSaveDir[0]),LookSaveNum);
-		cout<<"\tSave in "<<Buffer<<"\n";
-		{
-			ofstream File(Buffer,ios::binary);
-			int N=Cloud_Frame.points.size();
-			unsigned char*p=Img_Frame.data;
-			float x,y,z,r,g,b;
-			for(int i=0;i<N;i++)
-			{
-				x=Cloud_Frame.points[i].x;
-				y=Cloud_Frame.points[i].y;
-				z=Cloud_Frame.points[i].z;
-				r=float(p[i*3+2])/255.0;
-				g=float(p[i*3+1])/255.0;
-				b=float(p[i*3])/255.0;
-				File.write((char*)(&x),sizeof(float));
-				File.write((char*)(&y),sizeof(float));
-				File.write((char*)(&z),sizeof(float));
-				File.write((char*)(&r),sizeof(float));
-				File.write((char*)(&g),sizeof(float));
-				File.write((char*)(&b),sizeof(float));
-			}
-			File.close();
-		}
+		// sprintf(Buffer,"%s/lookXYZRGB_inPos_%d.txt.XYZRGB",&(LookSaveDir[0]),LookSaveNum);
+		// cout<<"\tSave in "<<Buffer<<"\n";
+		// {
+			// ofstream File(Buffer,ios::binary);
+			// int N=Cloud_Frame.points.size();
+			// unsigned char*p=Img_Frame.data;
+			// float x,y,z,r,g,b;
+			// for(int i=0;i<N;i++)
+			// {
+				// x=Cloud_Frame.points[i].x;
+				// y=Cloud_Frame.points[i].y;
+				// z=Cloud_Frame.points[i].z;
+				// r=float(p[i*3+2])/255.0;
+				// g=float(p[i*3+1])/255.0;
+				// b=float(p[i*3])/255.0;
+				// File.write((char*)(&x),sizeof(float));
+				// File.write((char*)(&y),sizeof(float));
+				// File.write((char*)(&z),sizeof(float));
+				// File.write((char*)(&r),sizeof(float));
+				// File.write((char*)(&g),sizeof(float));
+				// File.write((char*)(&b),sizeof(float));
+			// }
+			// File.close();
+		// }
+		
+		
+		
+		
 	}
 }
 

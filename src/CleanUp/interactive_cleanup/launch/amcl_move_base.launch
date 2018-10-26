@@ -1,0 +1,32 @@
+<launch>
+	<arg name="map_file"                          default="/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/maps/final.yaml" />
+	<arg name="rgbd_camera"                       default="head_rgbd_sensor" />
+	
+	<!-- 加载地图 -->
+	<node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)" />
+
+	<!-- 加载amcl-->
+	<arg name="initial_pose_x" default="0.0"/>
+	<arg name="initial_pose_y" default="0.0"/>
+	<arg name="initial_pose_a" default="0.0"/>
+	<include file="$(find turtlebot_navigation)/launch/includes/amcl/amcl.launch.xml">
+		<arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+		<arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+		<arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+	</include>
+
+	<!-- 加载move_base -->
+	<arg name="cmd_vel_topic" default="/hsrb/opt_command_velocity" />
+	<arg name="odom_topic" default="odom" />
+	<node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+		<param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+		<rosparam file="$(find interactive_cleanup)/param/costmap_common_params_hsr.yaml" command="load" 	ns="global_costmap" />
+		<rosparam file="$(find interactive_cleanup)/param/costmap_common_params_hsr.yaml" command="load" ns="local_costmap" />
+		<rosparam file="$(find interactive_cleanup)/param/local_costmap_params.yaml" command="load" />
+		<rosparam file="$(find interactive_cleanup)/param/global_costmap_params.yaml" command="load" />
+		<rosparam file="$(find interactive_cleanup)/param/move_base_params.yaml" command="load" />
+		<rosparam file="$(find interactive_cleanup)/param/dwa_local_planner_params.yaml" command="load" />
+		<remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+		<remap from="odom" to="$(arg odom_topic)"/>
+	</node>
+</launch>

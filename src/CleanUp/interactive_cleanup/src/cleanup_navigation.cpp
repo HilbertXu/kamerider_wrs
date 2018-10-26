@@ -43,7 +43,7 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 string nav_dir = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/output_file";
 
 //ROS subscriber & publisher
-ros::Subscriber OPAros_sub;
+ros::Subscriber DOF_sub;
 ros::Publisher nav_pub;
 
 void reset()
@@ -54,7 +54,7 @@ void reset()
 	nav_flag.data = "";
 }
 
-void printNavXml(geometry_msgs::Pose nav_pose)
+void printNavPose(geometry_msgs::Pose nav_pose)
 {
 	cout << "the navigation position is: " << endl;
 	float p_x = nav_pose.position.x; cout << p_x << endl;
@@ -68,45 +68,11 @@ void printNavXml(geometry_msgs::Pose nav_pose)
 	float o_w = nav_pose.orientation.w; cout << o_w << endl;
 }
 
-void readXmlFiles(string &dir)
+void DOFCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
-	ROS_INFO("start reading position xml files");
-	string GCP_Path = dir + "/GCP_Nav_Pos.xml";
-	cv::FileStorage GCP_xml(GCP_Path, cv::FileStorage::READ);
-	GCP_Pose.position.x = GCP_xml["position"]["x"];
-	GCP_Pose.position.y = GCP_xml["position"]["y"];
-	GCP_Pose.position.z = GCP_xml["position"]["z"];
-
-	GCP_Pose.orientation.x = GCP_xml["orientation"]["x"];
-	GCP_Pose.orientation.y = GCP_xml["orientation"]["y"];
-	GCP_Pose.orientation.z = GCP_xml["orientation"]["z"];
-	GCP_Pose.orientation.w = GCP_xml["orientation"]["w"];
-	printNavXml(GCP_Pose);
-	GCP_xml.release();
-
-	string DCP_Path = dir + "/DCP_Nav_Pos.xml";
-	cv::FileStorage DCP_xml(DCP_Path, cv::FileStorage::READ);
-	DCP_Pose.position.x = DCP_xml["position"]["x"];
-	DCP_Pose.position.y = DCP_xml["position"]["y"];
-	DCP_Pose.position.z = DCP_xml["position"]["z"];
-
-	DCP_Pose.orientation.x = DCP_xml["orientation"]["x"];
-	DCP_Pose.orientation.y = DCP_xml["orientation"]["y"];
-	DCP_Pose.orientation.z = DCP_xml["orientation"]["z"];
-	DCP_Pose.orientation.w = DCP_xml["orientation"]["w"];
-	printNavXml(DCP_Pose);
-	DCP_xml.release();
-
+	GCP_Pose = msg->pose;
 	ifNavigate = true;
 	ifGo2GCP   = true;
-}
-
-void OPArosCallback(const std_msgs::String::ConstPtr& msg)
-{
-	if(msg->data == "start")
-	{
-		readXmlFiles(nav_dir);
-	}
 }
 
 void ObjCallback(const std_msgs::String::ConstPtr& msg)
@@ -122,7 +88,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "cleanup_navigation");
 	ros::NodeHandle nh;
 	ROS_INFO("Initial ROS Noed");
-	OPAros_sub = nh.subscribe("/OPAros2nav", 1, OPArosCallback);
+	DOF_sub = nh.subscribe("/move_base_simple/goal", 1, DOFCallback);
 	nav_pub    = nh.advertise<std_msgs::String>("/nav2obj", 1);
 
 	ROS_INFO("Initial Move Base");

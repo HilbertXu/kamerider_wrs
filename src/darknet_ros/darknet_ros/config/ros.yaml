@@ -1,7 +1,7 @@
 subscribers:
 
   camera_reading:
-    topic: /hsrb/head_rgbd_sensor/rgb/image_raw
+    topic: /bOBJimage
     queue_size: 1
 
 actions:

@@ -166,6 +166,51 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/rule:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/rule
+.PHONY : CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/rule
+
+# Convenience name for target.
+GetGCPinDarknet: CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/rule
+
+.PHONY : GetGCPinDarknet
+
+# fast build rule for target.
+GetGCPinDarknet/fast:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/build
+.PHONY : GetGCPinDarknet/fast
+
+# Convenience name for target.
+CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/rule:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/rule
+.PHONY : CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/rule
+
+# Convenience name for target.
+CamShift_Avatar: CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/rule
+
+.PHONY : CamShift_Avatar
+
+# fast build rule for target.
+CamShift_Avatar/fast:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/build
+.PHONY : CamShift_Avatar/fast
+
+# Convenience name for target.
+CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/rule:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/rule
+.PHONY : CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/rule
+
+# Convenience name for target.
+PubGoalPose: CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/rule
+
+.PHONY : PubGoalPose
+
+# fast build rule for target.
+PubGoalPose/fast:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/build
+.PHONY : PubGoalPose/fast
+
+# Convenience name for target.
 CleanUp/interactive_cleanup/CMakeFiles/find_graspable_object.dir/rule:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/find_graspable_object.dir/rule
 .PHONY : CleanUp/interactive_cleanup/CMakeFiles/find_graspable_object.dir/rule
@@ -901,21 +946,6 @@ trajectory_msgs_generate_messages_cpp/fast:
 .PHONY : trajectory_msgs_generate_messages_cpp/fast
 
 # Convenience name for target.
-CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/rule:
-	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/rule
-.PHONY : CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/rule
-
-# Convenience name for target.
-DOFmove_AutoGcpDcp: CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/rule
-
-.PHONY : DOFmove_AutoGcpDcp
-
-# fast build rule for target.
-DOFmove_AutoGcpDcp/fast:
-	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/build
-.PHONY : DOFmove_AutoGcpDcp/fast
-
-# Convenience name for target.
 CleanUp/interactive_cleanup/CMakeFiles/roscpp_generate_messages_eus.dir/rule:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/roscpp_generate_messages_eus.dir/rule
 .PHONY : CleanUp/interactive_cleanup/CMakeFiles/roscpp_generate_messages_eus.dir/rule
@@ -1036,6 +1066,21 @@ roscpp_generate_messages_nodejs/fast:
 .PHONY : roscpp_generate_messages_nodejs/fast
 
 # Convenience name for target.
+CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/rule:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/rule
+.PHONY : CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/rule
+
+# Convenience name for target.
+FromONavPts: CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/rule
+
+.PHONY : FromONavPts
+
+# fast build rule for target.
+FromONavPts/fast:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/build
+.PHONY : FromONavPts/fast
+
+# Convenience name for target.
 CleanUp/interactive_cleanup/CMakeFiles/roscpp_generate_messages_lisp.dir/rule:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
 .PHONY : CleanUp/interactive_cleanup/CMakeFiles/roscpp_generate_messages_lisp.dir/rule
@@ -1079,6 +1124,21 @@ std_msgs_generate_messages_eus: CleanUp/interactive_cleanup/CMakeFiles/std_msgs_
 std_msgs_generate_messages_eus/fast:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/std_msgs_generate_messages_eus.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/std_msgs_generate_messages_eus.dir/build
 .PHONY : std_msgs_generate_messages_eus/fast
+
+# Convenience name for target.
+CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/rule:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/rule
+.PHONY : CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/rule
+
+# Convenience name for target.
+DOFmove_AutoGcp: CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/rule
+
+.PHONY : DOFmove_AutoGcp
+
+# fast build rule for target.
+DOFmove_AutoGcp/fast:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/build
+.PHONY : DOFmove_AutoGcp/fast
 
 # Convenience name for target.
 CleanUp/interactive_cleanup/CMakeFiles/tf_generate_messages_nodejs.dir/rule:
@@ -1381,6 +1441,21 @@ nav_msgs_generate_messages_cpp/fast:
 .PHONY : nav_msgs_generate_messages_cpp/fast
 
 # Convenience name for target.
+CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/rule:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/rule
+.PHONY : CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/rule
+
+# Convenience name for target.
+GCPresPanTilt: CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/rule
+
+.PHONY : GCPresPanTilt
+
+# fast build rule for target.
+GCPresPanTilt/fast:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/build
+.PHONY : GCPresPanTilt/fast
+
+# Convenience name for target.
 CleanUp/interactive_cleanup/CMakeFiles/LookObjPtsInImg.dir/rule:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/LookObjPtsInImg.dir/rule
 .PHONY : CleanUp/interactive_cleanup/CMakeFiles/LookObjPtsInImg.dir/rule
@@ -1604,6 +1679,21 @@ dynamic_reconfigure_generate_messages_py: CleanUp/interactive_cleanup/CMakeFiles
 dynamic_reconfigure_generate_messages_py/fast:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build
 .PHONY : dynamic_reconfigure_generate_messages_py/fast
+
+# Convenience name for target.
+CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/rule:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CMakeFiles/Makefile2 CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/rule
+.PHONY : CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/rule
+
+# Convenience name for target.
+test_darknet: CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/rule
+
+.PHONY : test_darknet
+
+# fast build rule for target.
+test_darknet/fast:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/build
+.PHONY : test_darknet/fast
 
 # Convenience name for target.
 CleanUp/interactive_cleanup/CMakeFiles/move_base_msgs_generate_messages_eus.dir/rule:
@@ -1935,6 +2025,33 @@ move_base_msgs_generate_messages_lisp/fast:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/move_base_msgs_generate_messages_lisp.dir/build
 .PHONY : move_base_msgs_generate_messages_lisp/fast
 
+src/CamShift_Avatar.o: src/CamShift_Avatar.cpp.o
+
+.PHONY : src/CamShift_Avatar.o
+
+# target to build an object file
+src/CamShift_Avatar.cpp.o:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/src/CamShift_Avatar.cpp.o
+.PHONY : src/CamShift_Avatar.cpp.o
+
+src/CamShift_Avatar.i: src/CamShift_Avatar.cpp.i
+
+.PHONY : src/CamShift_Avatar.i
+
+# target to preprocess a source file
+src/CamShift_Avatar.cpp.i:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/src/CamShift_Avatar.cpp.i
+.PHONY : src/CamShift_Avatar.cpp.i
+
+src/CamShift_Avatar.s: src/CamShift_Avatar.cpp.s
+
+.PHONY : src/CamShift_Avatar.s
+
+# target to generate assembly for a file
+src/CamShift_Avatar.cpp.s:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/src/CamShift_Avatar.cpp.s
+.PHONY : src/CamShift_Avatar.cpp.s
+
 src/DOFmove.o: src/DOFmove.cpp.o
 
 .PHONY : src/DOFmove.o
@@ -1962,32 +2079,32 @@ src/DOFmove.cpp.s:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove.dir/src/DOFmove.cpp.s
 .PHONY : src/DOFmove.cpp.s
 
-src/DOFmove_AutoGcpDcp.o: src/DOFmove_AutoGcpDcp.cpp.o
+src/DOFmove_AutoGcp.o: src/DOFmove_AutoGcp.cpp.o
 
-.PHONY : src/DOFmove_AutoGcpDcp.o
+.PHONY : src/DOFmove_AutoGcp.o
 
 # target to build an object file
-src/DOFmove_AutoGcpDcp.cpp.o:
-	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/src/DOFmove_AutoGcpDcp.cpp.o
-.PHONY : src/DOFmove_AutoGcpDcp.cpp.o
+src/DOFmove_AutoGcp.cpp.o:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/src/DOFmove_AutoGcp.cpp.o
+.PHONY : src/DOFmove_AutoGcp.cpp.o
 
-src/DOFmove_AutoGcpDcp.i: src/DOFmove_AutoGcpDcp.cpp.i
+src/DOFmove_AutoGcp.i: src/DOFmove_AutoGcp.cpp.i
 
-.PHONY : src/DOFmove_AutoGcpDcp.i
+.PHONY : src/DOFmove_AutoGcp.i
 
 # target to preprocess a source file
-src/DOFmove_AutoGcpDcp.cpp.i:
-	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/src/DOFmove_AutoGcpDcp.cpp.i
-.PHONY : src/DOFmove_AutoGcpDcp.cpp.i
+src/DOFmove_AutoGcp.cpp.i:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/src/DOFmove_AutoGcp.cpp.i
+.PHONY : src/DOFmove_AutoGcp.cpp.i
 
-src/DOFmove_AutoGcpDcp.s: src/DOFmove_AutoGcpDcp.cpp.s
+src/DOFmove_AutoGcp.s: src/DOFmove_AutoGcp.cpp.s
 
-.PHONY : src/DOFmove_AutoGcpDcp.s
+.PHONY : src/DOFmove_AutoGcp.s
 
 # target to generate assembly for a file
-src/DOFmove_AutoGcpDcp.cpp.s:
-	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/src/DOFmove_AutoGcpDcp.cpp.s
-.PHONY : src/DOFmove_AutoGcpDcp.cpp.s
+src/DOFmove_AutoGcp.cpp.s:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/src/DOFmove_AutoGcp.cpp.s
+.PHONY : src/DOFmove_AutoGcp.cpp.s
 
 src/FollowAvatar.o: src/FollowAvatar.cpp.o
 
@@ -2015,6 +2132,87 @@ src/FollowAvatar.s: src/FollowAvatar.cpp.s
 src/FollowAvatar.cpp.s:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/FollowAvatar.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/FollowAvatar.dir/src/FollowAvatar.cpp.s
 .PHONY : src/FollowAvatar.cpp.s
+
+src/FromONavPts.o: src/FromONavPts.cpp.o
+
+.PHONY : src/FromONavPts.o
+
+# target to build an object file
+src/FromONavPts.cpp.o:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/src/FromONavPts.cpp.o
+.PHONY : src/FromONavPts.cpp.o
+
+src/FromONavPts.i: src/FromONavPts.cpp.i
+
+.PHONY : src/FromONavPts.i
+
+# target to preprocess a source file
+src/FromONavPts.cpp.i:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/src/FromONavPts.cpp.i
+.PHONY : src/FromONavPts.cpp.i
+
+src/FromONavPts.s: src/FromONavPts.cpp.s
+
+.PHONY : src/FromONavPts.s
+
+# target to generate assembly for a file
+src/FromONavPts.cpp.s:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/src/FromONavPts.cpp.s
+.PHONY : src/FromONavPts.cpp.s
+
+src/GCPresPanTilt.o: src/GCPresPanTilt.cpp.o
+
+.PHONY : src/GCPresPanTilt.o
+
+# target to build an object file
+src/GCPresPanTilt.cpp.o:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/src/GCPresPanTilt.cpp.o
+.PHONY : src/GCPresPanTilt.cpp.o
+
+src/GCPresPanTilt.i: src/GCPresPanTilt.cpp.i
+
+.PHONY : src/GCPresPanTilt.i
+
+# target to preprocess a source file
+src/GCPresPanTilt.cpp.i:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/src/GCPresPanTilt.cpp.i
+.PHONY : src/GCPresPanTilt.cpp.i
+
+src/GCPresPanTilt.s: src/GCPresPanTilt.cpp.s
+
+.PHONY : src/GCPresPanTilt.s
+
+# target to generate assembly for a file
+src/GCPresPanTilt.cpp.s:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/src/GCPresPanTilt.cpp.s
+.PHONY : src/GCPresPanTilt.cpp.s
+
+src/GetGCPinDarknet.o: src/GetGCPinDarknet.cpp.o
+
+.PHONY : src/GetGCPinDarknet.o
+
+# target to build an object file
+src/GetGCPinDarknet.cpp.o:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/src/GetGCPinDarknet.cpp.o
+.PHONY : src/GetGCPinDarknet.cpp.o
+
+src/GetGCPinDarknet.i: src/GetGCPinDarknet.cpp.i
+
+.PHONY : src/GetGCPinDarknet.i
+
+# target to preprocess a source file
+src/GetGCPinDarknet.cpp.i:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/src/GetGCPinDarknet.cpp.i
+.PHONY : src/GetGCPinDarknet.cpp.i
+
+src/GetGCPinDarknet.s: src/GetGCPinDarknet.cpp.s
+
+.PHONY : src/GetGCPinDarknet.s
+
+# target to generate assembly for a file
+src/GetGCPinDarknet.cpp.s:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/src/GetGCPinDarknet.cpp.s
+.PHONY : src/GetGCPinDarknet.cpp.s
 
 src/ListenTf.o: src/ListenTf.cpp.o
 
@@ -2124,6 +2322,33 @@ src/Position_Predict.cpp.s:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/Position_Predict.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/Position_Predict.dir/src/Position_Predict.cpp.s
 .PHONY : src/Position_Predict.cpp.s
 
+src/PubGoalPose.o: src/PubGoalPose.cpp.o
+
+.PHONY : src/PubGoalPose.o
+
+# target to build an object file
+src/PubGoalPose.cpp.o:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/src/PubGoalPose.cpp.o
+.PHONY : src/PubGoalPose.cpp.o
+
+src/PubGoalPose.i: src/PubGoalPose.cpp.i
+
+.PHONY : src/PubGoalPose.i
+
+# target to preprocess a source file
+src/PubGoalPose.cpp.i:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/src/PubGoalPose.cpp.i
+.PHONY : src/PubGoalPose.cpp.i
+
+src/PubGoalPose.s: src/PubGoalPose.cpp.s
+
+.PHONY : src/PubGoalPose.s
+
+# target to generate assembly for a file
+src/PubGoalPose.cpp.s:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/src/PubGoalPose.cpp.s
+.PHONY : src/PubGoalPose.cpp.s
+
 src/cleanup_navigation.o: src/cleanup_navigation.cpp.o
 
 .PHONY : src/cleanup_navigation.o
@@ -2232,6 +2457,33 @@ src/teleop_key_interactive_cleanup.cpp.s:
 	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/teleop_key_interactive_cleanup.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/teleop_key_interactive_cleanup.dir/src/teleop_key_interactive_cleanup.cpp.s
 .PHONY : src/teleop_key_interactive_cleanup.cpp.s
 
+src/test_darknet.o: src/test_darknet.cpp.o
+
+.PHONY : src/test_darknet.o
+
+# target to build an object file
+src/test_darknet.cpp.o:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/src/test_darknet.cpp.o
+.PHONY : src/test_darknet.cpp.o
+
+src/test_darknet.i: src/test_darknet.cpp.i
+
+.PHONY : src/test_darknet.i
+
+# target to preprocess a source file
+src/test_darknet.cpp.i:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/src/test_darknet.cpp.i
+.PHONY : src/test_darknet.cpp.i
+
+src/test_darknet.s: src/test_darknet.cpp.s
+
+.PHONY : src/test_darknet.s
+
+# target to generate assembly for a file
+src/test_darknet.cpp.s:
+	cd /home/kamerider/sim_ws/build && $(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/src/test_darknet.cpp.s
+.PHONY : src/test_darknet.cpp.s
+
 src/write_xml.o: src/write_xml.cpp.o
 
 .PHONY : src/write_xml.o
@@ -2295,6 +2547,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... install/local"
 	@echo "... install/strip"
+	@echo "... GetGCPinDarknet"
+	@echo "... CamShift_Avatar"
+	@echo "... PubGoalPose"
 	@echo "... find_graspable_object"
 	@echo "... DOFmove"
 	@echo "... write_xml"
@@ -2344,7 +2599,6 @@ help:
 	@echo "... sensor_msgs_generate_messages_nodejs"
 	@echo "... geometry_msgs_generate_messages_cpp"
 	@echo "... trajectory_msgs_generate_messages_cpp"
-	@echo "... DOFmove_AutoGcpDcp"
 	@echo "... roscpp_generate_messages_eus"
 	@echo "... bond_generate_messages_eus"
 	@echo "... interactive_cleanup_genlisp"
@@ -2355,9 +2609,11 @@ help:
 	@echo "... sensor_msgs_generate_messages_py"
 	@echo "... roscpp_generate_messages_nodejs"
 	@echo "... test"
+	@echo "... FromONavPts"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... actionlib_generate_messages_eus"
 	@echo "... std_msgs_generate_messages_eus"
+	@echo "... DOFmove_AutoGcp"
 	@echo "... tf_generate_messages_nodejs"
 	@echo "... std_srvs_generate_messages_py"
 	@echo "... std_msgs_generate_messages_nodejs"
@@ -2379,6 +2635,7 @@ help:
 	@echo "... tf2_msgs_generate_messages_nodejs"
 	@echo "... tf2_msgs_generate_messages_lisp"
 	@echo "... nav_msgs_generate_messages_cpp"
+	@echo "... GCPresPanTilt"
 	@echo "... LookObjPtsInImg"
 	@echo "... pcl_ros_gencfg"
 	@echo "... tf2_msgs_generate_messages_eus"
@@ -2394,6 +2651,7 @@ help:
 	@echo "... interactive_cleanup_generate_messages_eus"
 	@echo "... actionlib_generate_messages_py"
 	@echo "... dynamic_reconfigure_generate_messages_py"
+	@echo "... test_darknet"
 	@echo "... move_base_msgs_generate_messages_eus"
 	@echo "... OPArosNew_Xml"
 	@echo "... dynamic_reconfigure_gencfg"
@@ -2417,15 +2675,27 @@ help:
 	@echo "... topic_tools_generate_messages_nodejs"
 	@echo "... actionlib_msgs_generate_messages_lisp"
 	@echo "... move_base_msgs_generate_messages_lisp"
+	@echo "... src/CamShift_Avatar.o"
+	@echo "... src/CamShift_Avatar.i"
+	@echo "... src/CamShift_Avatar.s"
 	@echo "... src/DOFmove.o"
 	@echo "... src/DOFmove.i"
 	@echo "... src/DOFmove.s"
-	@echo "... src/DOFmove_AutoGcpDcp.o"
-	@echo "... src/DOFmove_AutoGcpDcp.i"
-	@echo "... src/DOFmove_AutoGcpDcp.s"
+	@echo "... src/DOFmove_AutoGcp.o"
+	@echo "... src/DOFmove_AutoGcp.i"
+	@echo "... src/DOFmove_AutoGcp.s"
 	@echo "... src/FollowAvatar.o"
 	@echo "... src/FollowAvatar.i"
 	@echo "... src/FollowAvatar.s"
+	@echo "... src/FromONavPts.o"
+	@echo "... src/FromONavPts.i"
+	@echo "... src/FromONavPts.s"
+	@echo "... src/GCPresPanTilt.o"
+	@echo "... src/GCPresPanTilt.i"
+	@echo "... src/GCPresPanTilt.s"
+	@echo "... src/GetGCPinDarknet.o"
+	@echo "... src/GetGCPinDarknet.i"
+	@echo "... src/GetGCPinDarknet.s"
 	@echo "... src/ListenTf.o"
 	@echo "... src/ListenTf.i"
 	@echo "... src/ListenTf.s"
@@ -2438,6 +2708,9 @@ help:
 	@echo "... src/Position_Predict.o"
 	@echo "... src/Position_Predict.i"
 	@echo "... src/Position_Predict.s"
+	@echo "... src/PubGoalPose.o"
+	@echo "... src/PubGoalPose.i"
+	@echo "... src/PubGoalPose.s"
 	@echo "... src/cleanup_navigation.o"
 	@echo "... src/cleanup_navigation.i"
 	@echo "... src/cleanup_navigation.s"
@@ -2450,6 +2723,9 @@ help:
 	@echo "... src/teleop_key_interactive_cleanup.o"
 	@echo "... src/teleop_key_interactive_cleanup.i"
 	@echo "... src/teleop_key_interactive_cleanup.s"
+	@echo "... src/test_darknet.o"
+	@echo "... src/test_darknet.i"
+	@echo "... src/test_darknet.s"
 	@echo "... src/write_xml.o"
 	@echo "... src/write_xml.i"
 	@echo "... src/write_xml.s"

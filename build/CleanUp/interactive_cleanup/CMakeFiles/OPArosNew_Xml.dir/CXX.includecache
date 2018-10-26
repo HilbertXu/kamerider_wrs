@@ -57,6 +57,8 @@ cv_bridge/cv_bridge.h
 -
 std_msgs/String.h
 /home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/src/std_msgs/String.h
+std_msgs/Float64MultiArray.h
+-
 
 /home/kamerider/softwares/opencv-3.3.1/build/cv_cpu_config.h
 
@@ -2700,6 +2702,24 @@ ros/builtin_message_traits.h
 ros/message_operations.h
 -
 
+/opt/ros/kinetic/include/std_msgs/Float64MultiArray.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+std_msgs/MultiArrayLayout.h
+-
+
 /opt/ros/kinetic/include/std_msgs/Header.h
 string
 -
@@ -2714,6 +2734,40 @@ ros/serialization.h
 ros/builtin_message_traits.h
 -
 ros/message_operations.h
+-
+
+/opt/ros/kinetic/include/std_msgs/MultiArrayDimension.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+
+/opt/ros/kinetic/include/std_msgs/MultiArrayLayout.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+std_msgs/MultiArrayDimension.h
 -
 
 /opt/ros/kinetic/include/std_msgs/String.h

@@ -264,9 +264,9 @@ add_executable(DOFmove src/DOFmove.cpp)
 add_dependencies(DOFmove ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(DOFmove ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
-add_executable(DOFmove_AutoGcpDcp src/DOFmove_AutoGcpDcp.cpp)
-add_dependencies(DOFmove_AutoGcpDcp ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
-target_link_libraries(DOFmove_AutoGcpDcp ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+add_executable(DOFmove_AutoGcp src/DOFmove_AutoGcp.cpp)
+add_dependencies(DOFmove_AutoGcp ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(DOFmove_AutoGcp ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
 add_executable(LookObjPtsInImg src/LookObjPtsInImg.cpp)
 add_dependencies(LookObjPtsInImg ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
@@ -275,3 +275,28 @@ target_link_libraries(LookObjPtsInImg ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 add_executable(find_graspable_object src/find_graspable_object.cpp)
 add_dependencies(find_graspable_object ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(find_graspable_object ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(GCPresPanTilt src/GCPresPanTilt.cpp)
+add_dependencies(GCPresPanTilt ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(GCPresPanTilt ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(test_darknet src/test_darknet.cpp)
+add_dependencies(test_darknet ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(test_darknet ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(PubGoalPose src/PubGoalPose.cpp)
+add_dependencies(PubGoalPose ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(PubGoalPose ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(CamShift_Avatar src/CamShift_Avatar.cpp)
+add_dependencies(CamShift_Avatar ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(CamShift_Avatar ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(FromONavPts src/FromONavPts.cpp)
+add_dependencies(FromONavPts ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(FromONavPts ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(GetGCPinDarknet src/GetGCPinDarknet.cpp)
+add_dependencies(GetGCPinDarknet ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(GetGCPinDarknet ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+

@@ -283,6 +283,45 @@ gtest_main/fast:
 .PHONY : gtest_main/fast
 
 #=============================================================================
+# Target rules for targets named GetGCPinDarknet
+
+# Build rule for target.
+GetGCPinDarknet: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 GetGCPinDarknet
+.PHONY : GetGCPinDarknet
+
+# fast build rule for target.
+GetGCPinDarknet/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GetGCPinDarknet.dir/build
+.PHONY : GetGCPinDarknet/fast
+
+#=============================================================================
+# Target rules for targets named CamShift_Avatar
+
+# Build rule for target.
+CamShift_Avatar: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 CamShift_Avatar
+.PHONY : CamShift_Avatar
+
+# fast build rule for target.
+CamShift_Avatar/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/CamShift_Avatar.dir/build
+.PHONY : CamShift_Avatar/fast
+
+#=============================================================================
+# Target rules for targets named PubGoalPose
+
+# Build rule for target.
+PubGoalPose: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 PubGoalPose
+.PHONY : PubGoalPose
+
+# fast build rule for target.
+PubGoalPose/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/PubGoalPose.dir/build
+.PHONY : PubGoalPose/fast
+
+#=============================================================================
 # Target rules for targets named find_graspable_object
 
 # Build rule for target.
@@ -920,19 +959,6 @@ trajectory_msgs_generate_messages_cpp/fast:
 .PHONY : trajectory_msgs_generate_messages_cpp/fast
 
 #=============================================================================
-# Target rules for targets named DOFmove_AutoGcpDcp
-
-# Build rule for target.
-DOFmove_AutoGcpDcp: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 DOFmove_AutoGcpDcp
-.PHONY : DOFmove_AutoGcpDcp
-
-# fast build rule for target.
-DOFmove_AutoGcpDcp/fast:
-	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcpDcp.dir/build
-.PHONY : DOFmove_AutoGcpDcp/fast
-
-#=============================================================================
 # Target rules for targets named roscpp_generate_messages_eus
 
 # Build rule for target.
@@ -1037,6 +1063,19 @@ roscpp_generate_messages_nodejs/fast:
 .PHONY : roscpp_generate_messages_nodejs/fast
 
 #=============================================================================
+# Target rules for targets named FromONavPts
+
+# Build rule for target.
+FromONavPts: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 FromONavPts
+.PHONY : FromONavPts
+
+# fast build rule for target.
+FromONavPts/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/FromONavPts.dir/build
+.PHONY : FromONavPts/fast
+
+#=============================================================================
 # Target rules for targets named roscpp_generate_messages_lisp
 
 # Build rule for target.
@@ -1074,6 +1113,19 @@ std_msgs_generate_messages_eus: cmake_check_build_system
 std_msgs_generate_messages_eus/fast:
 	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/std_msgs_generate_messages_eus.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/std_msgs_generate_messages_eus.dir/build
 .PHONY : std_msgs_generate_messages_eus/fast
+
+#=============================================================================
+# Target rules for targets named DOFmove_AutoGcp
+
+# Build rule for target.
+DOFmove_AutoGcp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 DOFmove_AutoGcp
+.PHONY : DOFmove_AutoGcp
+
+# fast build rule for target.
+DOFmove_AutoGcp/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/DOFmove_AutoGcp.dir/build
+.PHONY : DOFmove_AutoGcp/fast
 
 #=============================================================================
 # Target rules for targets named tf_generate_messages_nodejs
@@ -1336,6 +1388,19 @@ nav_msgs_generate_messages_cpp/fast:
 .PHONY : nav_msgs_generate_messages_cpp/fast
 
 #=============================================================================
+# Target rules for targets named GCPresPanTilt
+
+# Build rule for target.
+GCPresPanTilt: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 GCPresPanTilt
+.PHONY : GCPresPanTilt
+
+# fast build rule for target.
+GCPresPanTilt/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/GCPresPanTilt.dir/build
+.PHONY : GCPresPanTilt/fast
+
+#=============================================================================
 # Target rules for targets named LookObjPtsInImg
 
 # Build rule for target.
@@ -1529,6 +1594,19 @@ dynamic_reconfigure_generate_messages_py: cmake_check_build_system
 dynamic_reconfigure_generate_messages_py/fast:
 	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build
 .PHONY : dynamic_reconfigure_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named test_darknet
+
+# Build rule for target.
+test_darknet: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 test_darknet
+.PHONY : test_darknet
+
+# fast build rule for target.
+test_darknet/fast:
+	$(MAKE) -f CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/build.make CleanUp/interactive_cleanup/CMakeFiles/test_darknet.dir/build
+.PHONY : test_darknet/fast
 
 #=============================================================================
 # Target rules for targets named move_base_msgs_generate_messages_eus
@@ -2116,19 +2194,6 @@ darknet_ros/fast:
 .PHONY : darknet_ros/fast
 
 #=============================================================================
-# Target rules for targets named finding_auto
-
-# Build rule for target.
-finding_auto: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 finding_auto
-.PHONY : finding_auto
-
-# fast build rule for target.
-finding_auto/fast:
-	$(MAKE) -f darknet_ros/sigverse_open_manipulator/CMakeFiles/finding_auto.dir/build.make darknet_ros/sigverse_open_manipulator/CMakeFiles/finding_auto.dir/build
-.PHONY : finding_auto/fast
-
-#=============================================================================
 # Target rules for targets named sigverse_ros_bridge
 
 # Build rule for target.
@@ -2215,6 +2280,9 @@ help:
 	@echo "... gmock_main"
 	@echo "... gtest"
 	@echo "... gtest_main"
+	@echo "... GetGCPinDarknet"
+	@echo "... CamShift_Avatar"
+	@echo "... PubGoalPose"
 	@echo "... find_graspable_object"
 	@echo "... DOFmove"
 	@echo "... write_xml"
@@ -2264,7 +2332,6 @@ help:
 	@echo "... sensor_msgs_generate_messages_nodejs"
 	@echo "... geometry_msgs_generate_messages_cpp"
 	@echo "... trajectory_msgs_generate_messages_cpp"
-	@echo "... DOFmove_AutoGcpDcp"
 	@echo "... roscpp_generate_messages_eus"
 	@echo "... bond_generate_messages_eus"
 	@echo "... interactive_cleanup_genlisp"
@@ -2273,9 +2340,11 @@ help:
 	@echo "... rosgraph_msgs_generate_messages_lisp"
 	@echo "... sensor_msgs_generate_messages_py"
 	@echo "... roscpp_generate_messages_nodejs"
+	@echo "... FromONavPts"
 	@echo "... roscpp_generate_messages_lisp"
 	@echo "... actionlib_generate_messages_eus"
 	@echo "... std_msgs_generate_messages_eus"
+	@echo "... DOFmove_AutoGcp"
 	@echo "... tf_generate_messages_nodejs"
 	@echo "... std_srvs_generate_messages_py"
 	@echo "... std_msgs_generate_messages_nodejs"
@@ -2296,6 +2365,7 @@ help:
 	@echo "... tf2_msgs_generate_messages_nodejs"
 	@echo "... tf2_msgs_generate_messages_lisp"
 	@echo "... nav_msgs_generate_messages_cpp"
+	@echo "... GCPresPanTilt"
 	@echo "... LookObjPtsInImg"
 	@echo "... pcl_ros_gencfg"
 	@echo "... tf2_msgs_generate_messages_eus"
@@ -2311,6 +2381,7 @@ help:
 	@echo "... interactive_cleanup_generate_messages_eus"
 	@echo "... actionlib_generate_messages_py"
 	@echo "... dynamic_reconfigure_generate_messages_py"
+	@echo "... test_darknet"
 	@echo "... move_base_msgs_generate_messages_eus"
 	@echo "... OPArosNew_Xml"
 	@echo "... dynamic_reconfigure_gencfg"
@@ -2356,7 +2427,6 @@ help:
 	@echo "... _darknet_ros_msgs_generate_messages_check_deps_CheckForObjectsGoal"
 	@echo "... darknet_ros_lib"
 	@echo "... darknet_ros"
-	@echo "... finding_auto"
 	@echo "... sigverse_ros_bridge"
 	@echo "... teleop_key"
 	@echo "... grasping_teleop_key"

@@ -16,11 +16,12 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include "std_msgs/String.h"
+#include <std_msgs/Float64MultiArray.h>
 
 using namespace std;
 using namespace cv;
 
-//OpenPoseÀï¼ì²âµ½Pose¹Ø½Ú¶ÔÓ¦±àºÅ(´Ó0¿ªÊ¼Êý,µ½17)
+//OpenPoseï¿½ï¿½ï¿½ï¿½ï¿½âµ½Poseï¿½Ø½Ú¶ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½0ï¿½ï¿½Ê¼ï¿½ï¿½,ï¿½ï¿½17)
 #define MNeckNum 1
 #define RShoulderNum 2
 #define RElbowNum 3
@@ -29,60 +30,63 @@ using namespace cv;
 #define LElbowNum 6
 #define LWristNum 7
 #define MidHipNum 8
-//OpenPoseÀï¼ì²âµ½ÊÖ²¿¹Ø½Ú¶ÔÓ¦±àºÅ(´Ó0¿ªÊ¼Êý,µ½20)
+//OpenPoseï¿½ï¿½ï¿½ï¿½ï¿½âµ½ï¿½Ö²ï¿½ï¿½Ø½Ú¶ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½0ï¿½ï¿½Ê¼ï¿½ï¿½,ï¿½ï¿½20)
 #define IFinSecNum 7
 
 
 const double VeryBig=9e300;
 const int MAX_PATH=260;
-char Buffer[MAX_PATH];//»º³åÇø
-unsigned char floatBuffer[4];//ËÄ×Ö½ÚºÏ²¢floatÊý¾ÝµÄ»º³åÇø
-int PngStaticNum=0;//±£´æÍ¼Æ¬µÄÐòºÅ,Pick_it_up!Ê±Îª1,Clean_up!Ê±Îª2
-int PtsStaticNum=0;//½ÓÊÕÏûÏ¢µÄÐòºÅ,Pick_it_up!Ê±Îª1,Clean_up!Ê±Îª2
-bool PngIsSave=false;//µ±Ç°ÊÇ·ñÊÕµ½Pick_it_up!»òClean_up!ÏûÏ¢,´Ó¶øÈ·¶¨ÊÇ·ñ½«Í¼Æ¬Ð´³ö
-bool PtsIsSave=false;//µ±Ç°ÊÇ·ñÊÕµ½Pick_it_up!»òClean_up!ÏûÏ¢,´Ó¶øÈ·¶¨ÊÇ·ñ½«µãÔÆÏûÏ¢Ð´³ö
-pcl::PointCloud<pcl::PointXYZ> Cloud_Pick;//´æ´¢Pick_it_up!Ê±Í·²¿´«¸ÐÆ÷µãÔÆ×ªµ½map×ø±êÏµÏÂµÄÃèÊö
-pcl::PointCloud<pcl::PointXYZ> Cloud_Clean;//´æ´¢Clean_up!Ê±Í·²¿´«¸ÐÆ÷µãÔÆ×ªµ½map×ø±êÏµÏÂµÄÃèÊö
-Mat Img_Pick;//´æ´¢Pick_it_up!Ê±Í·²¿´«¸ÐÆ÷ÅÄÉãµ½µÄRGBÍ¼Æ¬
-Mat Img_Clean;//´æ´¢Clean_up!
-Mat Img_Frame;//´æ´¢Í·²¿´«¸ÐÆ÷ÅÄÉãµ½µÄRGBÍ¼Æ¬¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¶îÍâÌí¼Ó
-const int ImgWidth = 640;//Í·²¿´«¸ÐÆ÷ÅÄÉãµ½µÄRGBÍ¼Æ¬¿í¶È
-const int ImgHeight = 480;//Í·²¿´«¸ÐÆ÷ÅÄÉãµ½µÄRGBÍ¼Æ¬¸ß¶È
+char Buffer[MAX_PATH];//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+unsigned char floatBuffer[4];//ï¿½ï¿½ï¿½Ö½ÚºÏ²ï¿½floatï¿½ï¿½ï¿½ÝµÄ»ï¿½ï¿½ï¿½ï¿½ï¿½
+int PngStaticNum=0;//ï¿½ï¿½ï¿½ï¿½Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Pick_it_up!Ê±Îª1,Clean_up!Ê±Îª2
+int PtsStaticNum=0;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Pick_it_up!Ê±Îª1,Clean_up!Ê±Îª2
+bool PngIsSave=false;//ï¿½ï¿½Ç°ï¿½Ç·ï¿½ï¿½Õµï¿½Pick_it_up!ï¿½ï¿½Clean_up!ï¿½ï¿½Ï¢,ï¿½Ó¶ï¿½È·ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½Í¼Æ¬Ð´ï¿½ï¿½
+bool PtsIsSave=false;//ï¿½ï¿½Ç°ï¿½Ç·ï¿½ï¿½Õµï¿½Pick_it_up!ï¿½ï¿½Clean_up!ï¿½ï¿½Ï¢,ï¿½Ó¶ï¿½È·ï¿½ï¿½ï¿½Ç·ñ½«µï¿½ï¿½ï¿½ï¿½ï¿½Ï¢Ð´ï¿½ï¿½
+pcl::PointCloud<pcl::PointXYZ> Cloud_Pick;//ï¿½æ´¢Pick_it_up!Ê±Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½mapï¿½ï¿½ï¿½ï¿½Ïµï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½
+pcl::PointCloud<pcl::PointXYZ> Cloud_Clean;//ï¿½æ´¢Clean_up!Ê±Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½mapï¿½ï¿½ï¿½ï¿½Ïµï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½
+Mat Img_Pick;//ï¿½æ´¢Pick_it_up!Ê±Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ãµ½ï¿½ï¿½RGBÍ¼Æ¬
+Mat Img_Clean;//ï¿½æ´¢Clean_up!
+Mat Img_Frame;//ï¿½æ´¢Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ãµ½ï¿½ï¿½RGBÍ¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+const int ImgWidth = 640;//Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ãµ½ï¿½ï¿½RGBÍ¼Æ¬ï¿½ï¿½ï¿½ï¿½
+const int ImgHeight = 480;//Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ãµ½ï¿½ï¿½RGBÍ¼Æ¬ï¿½ß¶ï¿½
 
 
-//png, json, xmlÎÄ¼þ±£´æÂ·¾¶
+//png, json, xmlï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½
 string png_dir      = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/openpose_img";
 string json_dir     = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/json_files";
 string xml_dir      = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/MPose.xml";
 string output_dir   = "/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/output_file";
 
-string SaveDir;//png¡¢jsonÎÄ¼þ±£´æÂ·¾¶
-ros::Subscriber sub_Img;//Í·²¿´«¸ÐÆ÷RGBÍ¼Æ¬µÄ¶©ÔÄÆ÷
-ros::Subscriber sub_PtCloud;//Í·²¿´«¸ÐÆ÷µãÔÆÏûÏ¢µÄ¶©ÔÄÆ÷
-ros::Subscriber sub_Cup;//AvatarÖ¸ÁîÐÅÏ¢µÄ¶©ÔÄÆ÷
+string SaveDir;//pngï¿½ï¿½jsonï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½
+ros::Subscriber sub_Img;//Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½RGBÍ¼Æ¬ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½
+ros::Subscriber sub_PtCloud;//Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½
+ros::Subscriber sub_Cup;//AvatarÖ¸ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ä¶ï¿½ï¿½ï¿½ï¿½ï¿½
 ros::Subscriber sub_Openpose;
 
-tf::StampedTransform CurrTf;//¼àÌýµ½µÄtf±ä»»
-tf::TransformListener*pListener;//¼àÌýtf±ä»»µÄÉè±¸Ö¸Õë,¾ßÌå¶¨ÒåÔÚmainº¯Êýros::initÖ®ºóÁË
-ros::Publisher pcl_pub;//µãÔÆ×ªµ½map×ø±êÏµÏÂ×ø±êºóµÄ·¢²¼Æ÷
-ros::Publisher TargetPos_pub;//·¢²¼×îÖÕ½á¹û
+tf::StampedTransform CurrTf;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tfï¿½ä»»
+tf::TransformListener*pListener;//ï¿½ï¿½ï¿½ï¿½tfï¿½ä»»ï¿½ï¿½ï¿½è±¸Ö¸ï¿½ï¿½,ï¿½ï¿½ï¿½å¶¨ï¿½ï¿½ï¿½ï¿½mainï¿½ï¿½ï¿½ï¿½ros::initÖ®ï¿½ï¿½ï¿½ï¿½
+ros::Publisher pcl_pub;//ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½mapï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½
+ros::Publisher TargetPos_pub;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ½ï¿½ï¿½ï¿½
 ros::Publisher openpose_pub;
+ros::Publisher Avatar_pub;
 ros::Publisher nav_pub;
 ros::Publisher step_pub;
+ros::Publisher task_control;
+ros::Publisher Mat_pub;
 
-string SaveFileName;//³õÊ¼¼ÓÔØxmlÂ·¾¶
-Mat M_U_T;//Unity×ø±êÏµÔÚMap×ø±êÏµÏÂµÄÃèÊö
-Mat U_Pos_GCP;//×¥È¡µãÔÚUnityÏÂµÄÎ»ÖÃ×ø±ê
-Mat U_Pos_DCP;//·ÅÖÃµãÔÚUnityÏÂµÄ×ø±ê
+string SaveFileName;//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½xmlÂ·ï¿½ï¿½
+Mat M_U_T;//Unityï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½Mapï¿½ï¿½ï¿½ï¿½Ïµï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½
+Mat U_Pos_GCP;//×¥È¡ï¿½ï¿½ï¿½ï¿½Unityï¿½Âµï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+Mat U_Pos_DCP;//ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Unityï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½
 Mat M_Pos_DCP_;
-vector<string> GCP_Names;//×¥È¡µãÃû³Æ
-vector<string> DCP_Names;//·ÅÖÃµãÃû³Æ
-vector<string> GCP_Names_sort;//×¥È¡µãÃû³Æ
-vector<string> DCP_Names_sort;//·ÅÖÃµãÃû³Æ
+vector<string> GCP_Names;//×¥È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+vector<string> DCP_Names;//ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½
+vector<string> GCP_Names_sort;//×¥È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+vector<string> DCP_Names_sort;//ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½
 
-Mat M_Pos_Furniture;//¼Ò¾ßÉÏ±íÃæÈýµã×ø±ê,Ã¿ÐÐÒ»¸ö¼Ò¾ßµÄÈý¸öµã,Ã¿¸öµãÓÐxyz
-vector<string> Furniture_Names;//¼Ò¾ßÃû³Æ
-string GroundName="Ground";//µØÃæÃû³Æ
+Mat M_Pos_Furniture;//ï¿½Ò¾ï¿½ï¿½Ï±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Ã¿ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ò¾ßµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xyz
+vector<string> Furniture_Names;//ï¿½Ò¾ï¿½ï¿½ï¿½ï¿½ï¿½
+string GroundName="Ground";//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 float p_x, p_y, p_z;
 float o_x, o_y, o_z, o_w;
@@ -115,14 +119,14 @@ void PrintMat(Mat&X,char*Name)
 void CalculateQuaternion(float w_x, float w_y, float w_z,
 						 float i_x, float i_y, float i_z)
 {
-	//È¡ÈËÊÖÍóºÍÊ³Ö¸µÚ¶þÖ¸½ÚÔÚÆ½ÃæÉÏµÄÍ¶Ó°(x,y,0)×÷Îª»úÆ÷ÈËµ¼º½µ½Ä¿±êµãÖ®ºóµÄ³¯Ïò
-	//»úÆ÷ÈËÖ»¾ßÓÐÈÆZÖá×ª¶¯µÄ½Ç¶È
+	//È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê³Ö¸ï¿½Ú¶ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Æ½ï¿½ï¿½ï¿½Ïµï¿½Í¶Ó°(x,y,0)ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½ï¿½Ä³ï¿½ï¿½ï¿½
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½ï¿½×ªï¿½ï¿½ï¿½Ä½Ç¶ï¿½
 	int x1 = w_x; int y1 = w_y;
 	int x2 = i_x; int y2 = i_y;
 	int z1 = 0  ; int z2 = 0  ;
 }
 
-//ËÄÉáÎåÈëº¯Êý
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ëº¯ï¿½ï¿½
 double round(double r)
 {
 	return (r > 0.0) ? floor(r + 0.5) : ceil(r - 0.5);
@@ -166,53 +170,9 @@ int FindNearValid(char Choice,int Idx)
 	return returnIdx;
 }
 
-void writeNavXml(string &fullPath, double p_x, double p_y, double p_z,
-								   double o_x, double o_y, double o_z,
-								   int xml_flag)
-{
-	if(xml_flag == 1)//write grasping candidate position
-	{
-		string xmlPath = fullPath + "/GCP_Nav_Pos.xml";
-		cv::FileStorage xmlFile(xmlPath, FileStorage::WRITE);
-		xmlFile << "position" << "{";
-		xmlFile << "x" << p_x;
-		xmlFile << "y" << p_y;
-		xmlFile << "z" << p_z;
-		xmlFile << "}";
-
-		xmlFile << "orientation" << "{";
-		xmlFile << "x" << o_x;
-		xmlFile << "y" << o_y;
-		xmlFile << "z" << o_z;
-		xmlFile << "w" << o_w;
-		xmlFile << "}";
-		xmlFile.release();
-	}
-
-
-	if(xml_flag == 2)
-	{
-		string xmlPath = fullPath + "/DCP_Nav_Pos.xml";
-		cv::FileStorage xmlFile(xmlPath, FileStorage::WRITE);
-		xmlFile << "position" << "{";
-		xmlFile << "x" << p_x;
-		xmlFile << "y" << p_y;
-		xmlFile << "z" << p_z;
-		xmlFile << "}";
-
-		xmlFile << "orientation" << "{";
-		xmlFile << "x" << o_x;
-		xmlFile << "y" << o_y;
-		xmlFile << "z" << o_z;
-		xmlFile << "w" << o_w;
-		xmlFile << "}";
-		xmlFile.release();
-	}
-}
-
-//°´ÅÅÐòÖ®ºó½á¹ûÖØÅÅ×Ö·û´®Ë³Ðò
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½Ë³ï¿½ï¿½
 void Quick_sort(vector<double>&Datas, vector<string>&strIdxs, int left, int right)
-{//Íâ²¿µ÷ÓÃÍê±Ïºó,»¥²»ÖØ¸´µÄËæ»úÏÂ±ê¾Í´æÔÚÁËIdxÖ¸ÏòµÄÄÚ´æÀï
+{//ï¿½â²¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïºï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â±ï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½ï¿½IdxÖ¸ï¿½ï¿½ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½
 	if (left >= right)return;
 	int i = left, j = right;
 	double key = Datas[left];
@@ -242,18 +202,18 @@ void Quick_sort(vector<double>&Datas, vector<string>&strIdxs, int left, int righ
 }
 
 
-//¶ÁÈ¡xmlº¯Êý
+//ï¿½ï¿½È¡xmlï¿½ï¿½ï¿½ï¿½
 void ReadModelsXml(string&SaveFileName,Mat&M_Pos_Furniture,vector<string>&Furniture_Names)
 {
 	FileStorage xmlFile(SaveFileName, FileStorage::READ);
 
 
 
-	//¶ÁÈ¡¼Ò¾ßÎ»ÖÃ¸öÊý
+	//ï¿½ï¿½È¡ï¿½Ò¾ï¿½Î»ï¿½Ã¸ï¿½ï¿½ï¿½
 	int N_Furniture;
 	xmlFile["M_Pos_Furniture"]["rows"]>>N_Furniture;
 
-	//¶ÁÈ¡FurnitureÎ»ÖÃµÄÃû×Ö
+	//ï¿½ï¿½È¡FurnitureÎ»ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½
 	for(int i=1;i<=N_Furniture;i++)
 	{
 		string TmpStr;
@@ -262,14 +222,14 @@ void ReadModelsXml(string&SaveFileName,Mat&M_Pos_Furniture,vector<string>&Furnit
 		Furniture_Names.push_back(TmpStr);
 	}
 
-	//¶ÁÈ¡FurnitureÎ»ÖÃ,Ã¿ÐÐÈý¸ö×ø±êÐÐÏòÁ¿
+	//ï¿½ï¿½È¡FurnitureÎ»ï¿½ï¿½,Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	M_Pos_Furniture=Mat::zeros(N_Furniture,9,CV_64F);
 	xmlFile["M_Pos_Furniture"] >> M_Pos_Furniture;
 
 	xmlFile.release();
 }
 
-//¶ÁÈ¡jsonº¯Êý
+//ï¿½ï¿½È¡jsonï¿½ï¿½ï¿½ï¿½
 void ReadJsonKeypoints(char*FullPath,vector<int>&DataNums,vector<double>&Data,
 									vector<int>&DataNums_L,vector<double>&Data_L,
 									vector<int>&DataNums_R,vector<double>&Data_R)
@@ -335,7 +295,7 @@ void ReadJsonKeypoints(char*FullPath,vector<int>&DataNums,vector<double>&Data,
 		}
 	}while(Json.peek() != EOF);
 }
-//¶ÁÈ¡OpenPoseÐ´³öµÄxmlÐÅÏ¢
+//ï¿½ï¿½È¡OpenPoseÐ´ï¿½ï¿½ï¿½ï¿½xmlï¿½ï¿½Ï¢
 void ReadXmlKeypoints(char*PoseXmlPath,char*RhandXmlPath,char*LhandXmlPath,
 					vector<double>&Data,vector<double>&Data_R,vector<double>&Data_L)
 {
@@ -402,13 +362,29 @@ void ReadXmlKeypoints(char*PoseXmlPath,char*RhandXmlPath,char*LhandXmlPath,
 	// printf("\n");
 }
 
+void PublishMat(Mat&X)
+{
+	int rows=X.rows;
+	int cols=X.cols;
+	double*p=(double*)(X.data);
+	int N=rows*cols;
+
+	std_msgs::Float64MultiArray msg;
+	msg.data.push_back(rows);
+	msg.data.push_back(cols);
+	for(int i=0;i<N;i++)
+	{
+		msg.data.push_back(p[i]);
+	}
+	Mat_pub.publish(msg);
+}
 
 
 Mat ComputePto(double Wx,double Wy,double Wz,
 				double Fx,double Fy,double Fz)
 {
-	//·µ»Ø¾ØÕóÃ¿ÐÐ¶ÔÓ¦Ò»¸öFurniture,×îºóÒ»ÐÐ¶ÔÓ¦µØÃæ
-	//¸÷ÁÐÒÀ´ÎÎªk u v Valid Dx Dy Dz
+	//ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½Ã¿ï¿½Ð¶ï¿½Ó¦Ò»ï¿½ï¿½Furniture,ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ð¶ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªk u v Valid Dx Dy Dz
 	Mat Result=Mat::zeros(Furniture_Names.size()+1,7,CV_64F);
 	double*pResult=(double*)(Result.data);
 	double*pM_Pos_Furniture=(double*)(M_Pos_Furniture.data);
@@ -469,10 +445,9 @@ Mat ComputePto(double Wx,double Wy,double Wz,
 int DealJson_FunNum=0;
 void DealJson()
 {
-	cout << "SO FUXKING xxxxxx" << endl;
 	DealJson_FunNum++;
 	/*{
-		//²âÊÔ×¨ÓÃ,½«È«¾Ö±äÁ¿Àï´æµÄµãÔÆ±£´æ³öÈ¥
+		//ï¿½ï¿½ï¿½ï¿½×¨ï¿½ï¿½,ï¿½ï¿½È«ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½Æ±ï¿½ï¿½ï¿½ï¿½ï¿½È¥
 		ofstream Txt_Pick("Cloud_Pick.txt");
 		for (int i = 0; i < Cloud_Pick.points.size(); ++i)
 		{
@@ -490,8 +465,8 @@ void DealJson()
 		Txt_Clean.close();
 	}*/
 
-	//µ÷ÓÃOpenPose½«ÎÄ¼þ¼ÐÖÐµÄÍ¼Æ¬±ê¶¨³ÉJSONÎÄ¼þ
-	//¡­¡­´Ë´¦Ó¦ÓÐÒ»¶Î´¦Àí´úÂëÔÚÖÕ¶ËÔËÐÐÈçÏÂÖ¸Áî
+	//ï¿½ï¿½ï¿½ï¿½OpenPoseï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ðµï¿½Í¼Æ¬ï¿½ê¶¨ï¿½ï¿½JSONï¿½Ä¼ï¿½
+	//ï¿½ï¿½ï¿½ï¿½ï¿½Ë´ï¿½Ó¦ï¿½ï¿½Ò»ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
 	//cd "~/OpenPose-master/Ubuntu/build" && "~/OpenPose-master/Ubuntu/build/OpenPose.bin" --image_dir "This is $(SaveDir)" --hand true --write_keypoint_json "This is $(SaveDir)"
 	// string Json1_Path=SaveDir + "/1_keypoints.json";
 	// string Json2_Path=SaveDir + "/2_keypoints.json";
@@ -554,10 +529,10 @@ void DealJson()
 
 
 
-	//ÏÖÔÚÔÚSaveDirÎÄ¼þ¼ÐÏÂÒÑ¾­ÓÐÁË1_keypoints.jsonºÍ2_keypoints.json
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½SaveDirï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½1_keypoints.jsonï¿½ï¿½2_keypoints.json
 	{
-		//¶ÁÈ¡Pick_it_up!Ê±Í¼Æ¬¶ÔÓ¦µÄ1_keypoints.json
-		//½«Î»ÖÃ¸´Ô­µ½ÈýÎ¬¿Õ¼ämap×ø±êÏµÏÂ,È·¶¨Pick_it_up!Ê±Ö¸µÄÊÇÄÄ¸öÎ»ÖÃ
+		//ï¿½ï¿½È¡Pick_it_up!Ê±Í¼Æ¬ï¿½ï¿½Ó¦ï¿½ï¿½1_keypoints.json
+		//ï¿½ï¿½Î»ï¿½Ã¸ï¿½Ô­ï¿½ï¿½ï¿½ï¿½Î¬ï¿½Õ¼ï¿½mapï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½,È·ï¿½ï¿½Pick_it_up!Ê±Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½Î»ï¿½ï¿½
 		//sprintf(Buffer, "%s/1_keypoints.json", &(SaveDir[0]));
 		vector<int>DataNums;
 		vector<double>Data;
@@ -573,7 +548,7 @@ void DealJson()
 		ReadXmlKeypoints(PoseXmlPath,RhandXmlPath,LhandXmlPath,Data,Data_R,Data_L);
 
 		/*{
-			//²âÊÔ×¨ÓÃ
+			//ï¿½ï¿½ï¿½ï¿½×¨ï¿½ï¿½
 			int StartIdx;
 			cout << "\n\n\nPick_it_up!:\n__________________________________________" << endl;
 
@@ -616,45 +591,45 @@ void DealJson()
 			cout << "__________________________________________" << endl;
 		}*/
 
-		//Mat U_Pos_GCP_ = Mat::ones(4, U_Pos_GCP.rows, CV_64F);//Ã¿ÁÐÒ»¸öÁÐÏòÁ¿[x y z 1]'
-		// double*pU_Pos_GCP_ = (double*)(U_Pos_GCP_.data);//4ÐÐÈô¸ÉÁÐ
-		// double*pU_Pos_GCP = (double*)(U_Pos_GCP.data);//Èô¸ÉÐÐ3ÁÐ
+		//Mat U_Pos_GCP_ = Mat::ones(4, U_Pos_GCP.rows, CV_64F);//Ã¿ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[x y z 1]'
+		// double*pU_Pos_GCP_ = (double*)(U_Pos_GCP_.data);//4ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		// double*pU_Pos_GCP = (double*)(U_Pos_GCP.data);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3ï¿½ï¿½
 		// for (int i = 0; i < U_Pos_GCP.rows; i++)
 		// {
 			// pU_Pos_GCP_[i] = pU_Pos_GCP[i * 3 + 0];
 			// pU_Pos_GCP_[i + U_Pos_GCP.rows] = pU_Pos_GCP[i * 3 + 1];
 			// pU_Pos_GCP_[i + U_Pos_GCP.rows*2] = pU_Pos_GCP[i * 3 + 2];
 		// }
-		// Mat M_Pos_GCP_ = M_U_T*U_Pos_GCP_;//Ã¿ÁÐ´æ´¢GCP¶ÔÓ¦µÄµØÍ¼×ø±êÏµÏÂ×ø±ê[x y z 1]'
-		// double*pM_Pos_GCP_ = (double*)(M_Pos_GCP_.data);//4ÐÐÈô¸ÉÁÐ
+		// Mat M_Pos_GCP_ = M_U_T*U_Pos_GCP_;//Ã¿ï¿½Ð´æ´¢GCPï¿½ï¿½Ó¦ï¿½Äµï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[x y z 1]'
+		// double*pM_Pos_GCP_ = (double*)(M_Pos_GCP_.data);//4ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-		//µ±Ç°Ê¹ÓÃÆðµãÎªÊÖÍó,ÖÕµãÎªÊ³Ö¸µÚ¶þÖ¸½Ú¹¹ÔìÉäÏß
-		//Ê×ÏÈ¸ù¾ÝÍó²¿ÓëÖÐÖáÏß¾àÀëÈ·¶¨AvatarÓÃµÄ×óÊÖ»¹ÊÇÓÒÊÖ
-		//ÒÀ´ÎÎªÖÐ¼ä²±×Óµã¡¢×óÊÖÍó¡¢×óÊÖÊ³Ö¸µÚ¶þÖ¸½Ú¡¢ÓÒÊÖÍó¡¢ÓÒÊÖÊ³Ö¸µÚ¶þÖ¸½Ú
-		//ÐèÒª±ä¶¯Ê±¸Ä´Ë´¦µÄºê¶¨Òå¼´¿É
+		//ï¿½ï¿½Ç°Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½,ï¿½Õµï¿½ÎªÊ³Ö¸ï¿½Ú¶ï¿½Ö¸ï¿½Ú¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		//ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¾ï¿½ï¿½ï¿½È·ï¿½ï¿½Avatarï¿½Ãµï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		//ï¿½ï¿½ï¿½ï¿½Îªï¿½Ð¼ä²±ï¿½Óµã¡¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê³Ö¸ï¿½Ú¶ï¿½Ö¸ï¿½Ú¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê³Ö¸ï¿½Ú¶ï¿½Ö¸ï¿½ï¿½
+		//ï¿½ï¿½Òªï¿½ä¶¯Ê±ï¿½Ä´Ë´ï¿½ï¿½Äºê¶¨ï¿½å¼´ï¿½ï¿½
 		int Mark_Idxs[] = { round(Data[MNeckNum * 3]) + round(Data[MNeckNum * 3 + 1] - 1) * ImgWidth,
-							round(Data[LWristNum * 3]) + round(Data[LWristNum * 3 + 1] - 1) * ImgWidth,
-							round(Data_L[IFinSecNum * 3]) + round(Data_L[IFinSecNum * 3 + 1] - 1) * ImgWidth,
-							round(Data[RWristNum * 3]) + round(Data[RWristNum * 3 + 1] - 1) * ImgWidth,
-							round(Data_R[IFinSecNum * 3]) + round(Data_R[IFinSecNum * 3 + 1] - 1) * ImgWidth };
+							round(Data[LElbowNum * 3]) + round(Data[LElbowNum * 3 + 1] - 1) * ImgWidth,
+							round(Data_L[LWristNum * 3]) + round(Data_L[LWristNum * 3 + 1] - 1) * ImgWidth,
+							round(Data[RElbowNum * 3]) + round(Data[RElbowNum * 3 + 1] - 1) * ImgWidth,
+							round(Data_R[RWristNum * 3]) + round(Data_R[RWristNum * 3 + 1] - 1) * ImgWidth };
 		int Hip_Idxs   =  round(Data[MidHipNum * 3]) + round(Data[MidHipNum * 3 + 1] - 1) * ImgWidth;
-		//£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡
-		//´Ë´¦×îºÃÓÐ´ÓÁÚÓòÖÐÕÒ·ÇNaNÊý×ÖµÄ²Ù×÷,·ñÔò¼«ÈÝÒ×µ¼ÖÂ¸´Ô­µ½ÈýÎ¬¿Õ¼äÖÐµÄÎÞÐ§µã
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		//ï¿½Ë´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò·ï¿½NaNï¿½ï¿½ï¿½ÖµÄ²ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×µï¿½ï¿½Â¸ï¿½Ô­ï¿½ï¿½ï¿½ï¿½Î¬ï¿½Õ¼ï¿½ï¿½Ðµï¿½ï¿½ï¿½Ð§ï¿½ï¿½
 		double M_x = Cloud_Pick.points[Mark_Idxs[0]].x;
 		double M_y = Cloud_Pick.points[Mark_Idxs[0]].y;
 		double M_z = Cloud_Pick.points[Mark_Idxs[0]].z;
-		double Lw_x = Cloud_Pick.points[Mark_Idxs[1]].x;
-		double Lw_y = Cloud_Pick.points[Mark_Idxs[1]].y;
-		double Lw_z = Cloud_Pick.points[Mark_Idxs[1]].z;
-		double Li_x = Cloud_Pick.points[Mark_Idxs[2]].x;
-		double Li_y = Cloud_Pick.points[Mark_Idxs[2]].y;
-		double Li_z = Cloud_Pick.points[Mark_Idxs[2]].z;
-		double Rw_x = Cloud_Pick.points[Mark_Idxs[3]].x;
-		double Rw_y = Cloud_Pick.points[Mark_Idxs[3]].y;
-		double Rw_z = Cloud_Pick.points[Mark_Idxs[3]].z;
-		double Ri_x = Cloud_Pick.points[Mark_Idxs[4]].x;
-		double Ri_y = Cloud_Pick.points[Mark_Idxs[4]].y;
-		double Ri_z = Cloud_Pick.points[Mark_Idxs[4]].z;
+		double Le_x = Cloud_Pick.points[Mark_Idxs[1]].x;
+		double Le_y = Cloud_Pick.points[Mark_Idxs[1]].y;
+		double Le_z = Cloud_Pick.points[Mark_Idxs[1]].z;
+		double Lw_x = Cloud_Pick.points[Mark_Idxs[2]].x;
+		double Lw_y = Cloud_Pick.points[Mark_Idxs[2]].y;
+		double Lw_z = Cloud_Pick.points[Mark_Idxs[2]].z;
+		double Re_x = Cloud_Pick.points[Mark_Idxs[3]].x;
+		double Re_y = Cloud_Pick.points[Mark_Idxs[3]].y;
+		double Re_z = Cloud_Pick.points[Mark_Idxs[3]].z;
+		double Rw_x = Cloud_Pick.points[Mark_Idxs[4]].x;
+		double Rw_y = Cloud_Pick.points[Mark_Idxs[4]].y;
+		double Rw_z = Cloud_Pick.points[Mark_Idxs[4]].z;
 
 		double Hip_x = Cloud_Pick.points[Hip_Idxs].x;
 		double Hip_y = Cloud_Pick.points[Hip_Idxs].y;
@@ -667,33 +642,33 @@ void DealJson()
 			M_y = Cloud_Pick.points[Mark_Idxs[0]].y;
 			M_z = Cloud_Pick.points[Mark_Idxs[0]].z;
 		}
-		if(isnan(Lw_x)||isnan(Lw_y)||isnan(Lw_z))
+		if(isnan(Le_x)||isnan(Le_y)||isnan(Le_z))
 		{
 			Mark_Idxs[1]=FindNearValid('p',Mark_Idxs[1]);
-			Lw_x = Cloud_Pick.points[Mark_Idxs[1]].x;
-			Lw_y = Cloud_Pick.points[Mark_Idxs[1]].y;
-			Lw_z = Cloud_Pick.points[Mark_Idxs[1]].z;
+			Le_x = Cloud_Pick.points[Mark_Idxs[1]].x;
+			Le_y = Cloud_Pick.points[Mark_Idxs[1]].y;
+			Le_z = Cloud_Pick.points[Mark_Idxs[1]].z;
 		}
-		if(isnan(Li_x)||isnan(Li_y)||isnan(Li_z))
+		if(isnan(Lw_x)||isnan(Lw_y)||isnan(Lw_z))
 		{
 			Mark_Idxs[2]=FindNearValid('p',Mark_Idxs[2]);
-			Li_x = Cloud_Pick.points[Mark_Idxs[2]].x;
-			Li_y = Cloud_Pick.points[Mark_Idxs[2]].y;
-			Li_z = Cloud_Pick.points[Mark_Idxs[2]].z;
+			Lw_x = Cloud_Pick.points[Mark_Idxs[2]].x;
+			Lw_y = Cloud_Pick.points[Mark_Idxs[2]].y;
+			Lw_z = Cloud_Pick.points[Mark_Idxs[2]].z;
+		}
+		if(isnan(Re_x)||isnan(Re_y)||isnan(Re_z))
+		{
+			Mark_Idxs[3]=FindNearValid('p',Mark_Idxs[3]);
+			Re_x = Cloud_Pick.points[Mark_Idxs[3]].x;
+			Re_y = Cloud_Pick.points[Mark_Idxs[3]].y;
+			Re_z = Cloud_Pick.points[Mark_Idxs[3]].z;
 		}
 		if(isnan(Rw_x)||isnan(Rw_y)||isnan(Rw_z))
 		{
-			Mark_Idxs[3]=FindNearValid('p',Mark_Idxs[3]);
-			Rw_x = Cloud_Pick.points[Mark_Idxs[3]].x;
-			Rw_y = Cloud_Pick.points[Mark_Idxs[3]].y;
-			Rw_z = Cloud_Pick.points[Mark_Idxs[3]].z;
-		}
-		if(isnan(Ri_x)||isnan(Ri_y)||isnan(Ri_z))
-		{
 			Mark_Idxs[4]=FindNearValid('p',Mark_Idxs[4]);
-			Ri_x = Cloud_Pick.points[Mark_Idxs[4]].x;
-			Ri_y = Cloud_Pick.points[Mark_Idxs[4]].y;
-			Ri_z = Cloud_Pick.points[Mark_Idxs[4]].z;
+			Rw_x = Cloud_Pick.points[Mark_Idxs[4]].x;
+			Rw_y = Cloud_Pick.points[Mark_Idxs[4]].y;
+			Rw_z = Cloud_Pick.points[Mark_Idxs[4]].z;
 		}
 		if(isnan(Hip_x)||isnan(Hip_y)||isnan(Hip_z))
 		{
@@ -706,30 +681,32 @@ void DealJson()
 
 		/*{
 			printf("%d\n%d\n%d\n%d\n%d\n", Mark_Idxs[0], Mark_Idxs[1], Mark_Idxs[2], Mark_Idxs[3], Mark_Idxs[4]);
-			//µ÷ÊÔ×¨ÓÃ
+			//ï¿½ï¿½ï¿½ï¿½×¨ï¿½ï¿½
 			printf("%.17g %.17g %.17g \n%.17g %.17g %.17g \n%.17g %.17g %.17g \n%.17g %.17g %.17g \n%.17g %.17g %.17g \n",
 				M_x, M_y, M_z, Lw_x, Lw_y, Lw_z, Li_x, Li_y, Li_z, Rw_x, Rw_y, Rw_z, Ri_x, Ri_y, Ri_z);
 		}*/
 		vector<double>Dis;
-		if ((Lw_x - M_x)*(Lw_x - M_x) + (Lw_y - M_y)*(Lw_y - M_y) >
-			(Rw_x - M_x)*(Rw_x - M_x) + (Rw_y - M_y)*(Rw_y - M_y))
+		if ((Lw_x - Le_x)*(Lw_x - Le_x) + (Lw_y - Le_y)*(Lw_y - Le_y) >
+			(Rw_x - Re_x)*(Rw_x - Re_x) + (Rw_y - Re_y)*(Rw_y - Re_y))
 		{
 			cout << "Avatar used left hand" << endl;
-			Mat Res=ComputePto(Lw_x,Lw_y,Lw_z,Li_x,Li_y,Li_z);
+			Mat Res=ComputePto(Le_x,Le_y,Le_z,Lw_x,Lw_y,Lw_z);
 			PrintMat(Res,"GCP_Res");
+			PublishMat(Res);
 			//writeNavXml();
 			cout << "\n";
 		}
 		else
 		{
 			cout << "Avatar used right hand" << endl;
-			Mat Res=ComputePto(Rw_x,Rw_y,Rw_z,Ri_x,Ri_y,Ri_z);
+			Mat Res=ComputePto(Re_x,Re_y,Re_z,Rw_x,Rw_y,Rw_z);
 			PrintMat(Res,"GCP_Res");
+			PublishMat(Res);
 			//writeNavXml();
 			cout << "\n";
 		}
 
-		//°´Dis´ÓÐ¡µ½´óÅÅÐòºóµÄGCP_Names´æÔÚÁËGCP_Names_sortÀï
+		//ï¿½ï¿½Disï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GCP_Namesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½GCP_Names_sortï¿½ï¿½
 		// for (int i = 0; i < GCP_Names.size(); i++) { GCP_Names_sort.push_back(GCP_Names[i]); }
 		// Quick_sort(Dis, GCP_Names_sort, 0, GCP_Names.size() - 1);
 		// string MsgStr = "";
@@ -742,8 +719,8 @@ void DealJson()
 	}
 
 	{
-		//¶ÁÈ¡Clean_up!Ê±Í¼Æ¬¶ÔÓ¦µÄ2_keypoints.json
-		//½«Î»ÖÃ¸´Ô­µ½ÈýÎ¬¿Õ¼ämap×ø±êÏµÏÂ,È·¶¨Clean_up!Ê±Ö¸µÄÊÇÄÄ¸öÎ»ÖÃ
+		//ï¿½ï¿½È¡Clean_up!Ê±Í¼Æ¬ï¿½ï¿½Ó¦ï¿½ï¿½2_keypoints.json
+		//ï¿½ï¿½Î»ï¿½Ã¸ï¿½Ô­ï¿½ï¿½ï¿½ï¿½Î¬ï¿½Õ¼ï¿½mapï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½,È·ï¿½ï¿½Clean_up!Ê±Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸ï¿½Î»ï¿½ï¿½
 		//sprintf(Buffer, "%s/2_keypoints.json", &(SaveDir[0]));
 		vector<int>DataNums;
 		vector<double>Data;
@@ -758,7 +735,7 @@ void DealJson()
 		ReadXmlKeypoints(PoseXmlPath,RhandXmlPath,LhandXmlPath,Data,Data_R,Data_L);
 
 		/*{
-			//²âÊÔ×¨ÓÃ
+			//ï¿½ï¿½ï¿½ï¿½×¨ï¿½ï¿½
 			int StartIdx;
 			cout << "\n\n\nClean_up!:\n__________________________________________" << endl;
 
@@ -801,9 +778,9 @@ void DealJson()
 
 		}*/
 
-		Mat U_Pos_DCP_ = Mat::ones(4, U_Pos_DCP.rows, CV_64F);//Ã¿ÁÐÒ»¸öÁÐÏòÁ¿[x y z 1]'
-		double*pU_Pos_DCP_ = (double*)(U_Pos_DCP_.data);//4ÐÐÈô¸ÉÁÐ
-		double*pU_Pos_DCP = (double*)(U_Pos_DCP.data);//Èô¸ÉÐÐ3ÁÐ
+		Mat U_Pos_DCP_ = Mat::ones(4, U_Pos_DCP.rows, CV_64F);//Ã¿ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[x y z 1]'
+		double*pU_Pos_DCP_ = (double*)(U_Pos_DCP_.data);//4ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		double*pU_Pos_DCP = (double*)(U_Pos_DCP.data);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3ï¿½ï¿½
 		for (int i = 0; i < U_Pos_DCP.rows; i++)
 		{
 			pU_Pos_DCP_[i] = pU_Pos_DCP[i * 3 + 0];
@@ -813,12 +790,12 @@ void DealJson()
 
 
 
-		double*pM_Pos_DCP_ = (double*)(M_Pos_DCP_.data);//4ÐÐÈô¸ÉÁÐ
+		double*pM_Pos_DCP_ = (double*)(M_Pos_DCP_.data);//4ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-														//µ±Ç°Ê¹ÓÃÆðµãÎªÊÖÍó,ÖÕµãÎªÊ³Ö¸µÚ¶þÖ¸½Ú¹¹ÔìÉäÏß
-														//Ê×ÏÈ¸ù¾ÝÍó²¿ÓëÖÐÖáÏß¾àÀëÈ·¶¨AvatarÓÃµÄ×óÊÖ»¹ÊÇÓÒÊÖ
-														//ÒÀ´ÎÎªÖÐ¼ä²±×Óµã¡¢×óÊÖÍó¡¢×óÊÖÊ³Ö¸µÚ¶þÖ¸½Ú¡¢ÓÒÊÖÍó¡¢ÓÒÊÖÊ³Ö¸µÚ¶þÖ¸½Ú
-														//ÐèÒª±ä¶¯Ê±¸Ä´Ë´¦µÄºê¶¨Òå¼´¿É
+														//ï¿½ï¿½Ç°Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½,ï¿½Õµï¿½ÎªÊ³Ö¸ï¿½Ú¶ï¿½Ö¸ï¿½Ú¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+														//ï¿½ï¿½ï¿½È¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¾ï¿½ï¿½ï¿½È·ï¿½ï¿½Avatarï¿½Ãµï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+														//ï¿½ï¿½ï¿½ï¿½Îªï¿½Ð¼ä²±ï¿½Óµã¡¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê³Ö¸ï¿½Ú¶ï¿½Ö¸ï¿½Ú¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê³Ö¸ï¿½Ú¶ï¿½Ö¸ï¿½ï¿½
+														//ï¿½ï¿½Òªï¿½ä¶¯Ê±ï¿½Ä´Ë´ï¿½ï¿½Äºê¶¨ï¿½å¼´ï¿½ï¿½
 		int Mark_Idxs[] = { round(Data[MNeckNum * 3]) + round(Data[MNeckNum * 3 + 1] - 1) * ImgWidth,
 			round(Data[LWristNum * 3]) + round(Data[LWristNum * 3 + 1] - 1) * ImgWidth,
 			round(Data_L[IFinSecNum * 3]) + round(Data_L[IFinSecNum * 3 + 1] - 1) * ImgWidth,
@@ -826,8 +803,8 @@ void DealJson()
 			round(Data_R[IFinSecNum * 3]) + round(Data_R[IFinSecNum * 3 + 1] - 1) * ImgWidth };
 
 		int Hip_Idxs = round(Data[MidHipNum * 3]) + round(Data[MidHipNum * 3 + 1] - 1) * ImgWidth;
-		//£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£¡
-		//´Ë´¦×îºÃÓÐ´ÓÁÚÓòÖÐÕÒ·ÇNaNÊý×ÖµÄ²Ù×÷,·ñÔò¼«ÈÝÒ×µ¼ÖÂ¸´Ô­µ½ÈýÎ¬¿Õ¼äÖÐµÄÎÞÐ§µã
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		//ï¿½Ë´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò·ï¿½NaNï¿½ï¿½ï¿½ÖµÄ²ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×µï¿½ï¿½Â¸ï¿½Ô­ï¿½ï¿½ï¿½ï¿½Î¬ï¿½Õ¼ï¿½ï¿½Ðµï¿½ï¿½ï¿½Ð§ï¿½ï¿½
 		double M_x = Cloud_Clean.points[Mark_Idxs[0]].x;
 		double M_y = Cloud_Clean.points[Mark_Idxs[0]].y;
 		double M_z = Cloud_Clean.points[Mark_Idxs[0]].z;
@@ -892,7 +869,7 @@ void DealJson()
 		}
 		/*{
 			printf("%d\n%d\n%d\n%d\n%d\n", Mark_Idxs[0], Mark_Idxs[1], Mark_Idxs[2], Mark_Idxs[3], Mark_Idxs[4]);
-			//µ÷ÊÔ×¨ÓÃ
+			//ï¿½ï¿½ï¿½ï¿½×¨ï¿½ï¿½
 			printf("%.17g %.17g %.17g \n%.17g %.17g %.17g \n%.17g %.17g %.17g \n%.17g %.17g %.17g \n%.17g %.17g %.17g \n",
 				M_x, M_y, M_z, Lw_x, Lw_y, Lw_z, Li_x, Li_y, Li_z, Rw_x, Rw_y, Rw_z, Ri_x, Ri_y, Ri_z);
 		}*/
@@ -910,7 +887,7 @@ void DealJson()
 				double DCP_i_y = pM_Pos_DCP_[i + U_Pos_DCP.rows];
 				double DCP_i_z = pM_Pos_DCP_[i + U_Pos_DCP.rows * 2];
 
-				//ÏòÁ¿WI²æ³ËÏòÁ¿W_DCPÈ¡Ä£µÃÆ½ÐÐËÄ±ßÐÎÃæ»ý
+				//ï¿½ï¿½ï¿½ï¿½WIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½W_DCPÈ¡Ä£ï¿½ï¿½Æ½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				double dis2 = ((Li_y - Lw_y)*(DCP_i_z - Lw_z) - (DCP_i_y - Lw_y)*(Li_z - Lw_z))*((Li_y - Lw_y)*(DCP_i_z - Lw_z) - (DCP_i_y - Lw_y)*(Li_z - Lw_z)) +
 					((DCP_i_x - Lw_x)*(Li_z - Lw_z) - (Li_x - Lw_x)*(DCP_i_z - Lw_z))*((DCP_i_x - Lw_x)*(Li_z - Lw_z) - (Li_x - Lw_x)*(DCP_i_z - Lw_z)) +
 					((Li_x - Lw_x)*(DCP_i_y - Lw_y) - (DCP_i_x - Lw_x)*(Li_y - Lw_y))*((Li_x - Lw_x)*(DCP_i_y - Lw_y) - (DCP_i_x - Lw_x)*(Li_y - Lw_y));
@@ -934,14 +911,14 @@ void DealJson()
 				double DCP_i_y = pM_Pos_DCP_[i + U_Pos_DCP.rows];
 				double DCP_i_z = pM_Pos_DCP_[i + U_Pos_DCP.rows * 2];
 
-				//ÏòÁ¿WI²æ³ËÏòÁ¿W_DCPÈ¡Ä£µÃÆ½ÐÐËÄ±ßÐÎÃæ»ý
+				//ï¿½ï¿½ï¿½ï¿½WIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½W_DCPÈ¡Ä£ï¿½ï¿½Æ½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				double dis2 = ((Ri_y - Rw_y)*(DCP_i_z - Rw_z) - (DCP_i_y - Rw_y)*(Ri_z - Rw_z))*((Ri_y - Rw_y)*(DCP_i_z - Rw_z) - (DCP_i_y - Rw_y)*(Ri_z - Rw_z)) +
 					((DCP_i_x - Rw_x)*(Ri_z - Rw_z) - (Ri_x - Rw_x)*(DCP_i_z - Rw_z))*((DCP_i_x - Rw_x)*(Ri_z - Rw_z) - (Ri_x - Rw_x)*(DCP_i_z - Rw_z)) +
 					((Ri_x - Rw_x)*(DCP_i_y - Rw_y) - (DCP_i_x - Rw_x)*(Ri_y - Rw_y))*((Ri_x - Rw_x)*(DCP_i_y - Rw_y) - (DCP_i_x - Rw_x)*(Ri_y - Rw_y));
 				Dis.push_back(sqrt(dis2));
 
 				cout << Dis[i] << " ";
-				//cout << DCP_i_x << " " << DCP_i_y << " " << DCP_i_z << endl;//µ÷ÊÔ×¨ÓÃ
+				//cout << DCP_i_x << " " << DCP_i_y << " " << DCP_i_z << endl;//ï¿½ï¿½ï¿½ï¿½×¨ï¿½ï¿½
 			}
 			cout << "\n";
 
@@ -949,25 +926,28 @@ void DealJson()
 			PrintMat(Res,"DCP_Res");
 			//writeNavXml();
 		}
-		//°´Dis´ÓÐ¡µ½´óÅÅÐòºóµÄDCP_Names´æÔÚÁËDCP_Names_sortÀï
+		//ï¿½ï¿½Disï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DCP_Namesï¿½ï¿½ï¿½ï¿½ï¿½ï¿½DCP_Names_sortï¿½ï¿½
 		for (int i = 0; i < DCP_Names.size(); i++) { DCP_Names_sort.push_back(DCP_Names[i]); }
 		Quick_sort(Dis, DCP_Names_sort, 0, DCP_Names.size() - 1);
 		string MsgStr = "";
 		for (int i = 0; i < DCP_Names.size(); i++) { MsgStr = MsgStr + DCP_Names_sort[i] + " "; }
 		cout << "DCP pos sort by dis:\n" << MsgStr << endl << endl;
 		std_msgs::String StrMsg;
+		std_msgs::String str;
 		StrMsg.data = MsgStr;
 		TargetPos_pub.publish(StrMsg);
-		std_msgs::String str;
-		str.data = "start";
-		nav_pub.publish(str);
+		int i = 1;
 		//communicate with control node
-		std.data = "OPAros_end";
-		step_pub.publish(str);
+		str.data = "OPAros_end";
+		if(i == 1)
+		{
+			step_pub.publish(str);
+			i++;
+		}
 	}
 }
 
-//¶©ÔÄÍ·²¿´«¸ÐÆ÷RGBÍ¼Æ¬µÄ»Øµ÷º¯Êý
+//ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½RGBÍ¼Æ¬ï¿½Ä»Øµï¿½ï¿½ï¿½ï¿½ï¿½
 void imageCallback(sensor_msgs::Image msg)
 {
 	cout << "RECEVING IMAGES" << endl;
@@ -984,13 +964,11 @@ void imageCallback(sensor_msgs::Image msg)
 		pData[i]=msg.data[i+2];
 	}
 	//cv::imshow("Img",Img);
-	Img_Frame=Img.clone();//¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¶îÍâÌí¼Ó
+	Img_Frame=Img.clone();//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	//cv::waitKey(10);
 	if(PngIsSave)
 	{
-		sprintf(Buffer,"%s/%d.png",&(png_dir[0]));
-		imwrite(Buffer,Img);
-		PngIsSave=false;
+		PngIsSave = false;
 		if (PngStaticNum == 1)
 		{
 			sprintf(Buffer,"%s/pick_it_up.png", &(png_dir[0]));
@@ -1002,11 +980,9 @@ void imageCallback(sensor_msgs::Image msg)
 			sprintf(Buffer, "%s/clean_up.png", &(png_dir[0]));
 			imwrite(Buffer,Img);
 			Img_Clean = Img.clone();
-		}
 
-		if(DealJson_FunNum==0&&!Img_Clean.empty()&&!Cloud_Clean.empty())
-		{
 			//start openpose
+			cout << "start openpose" <<endl;
 			std_msgs::String flag;
 			flag.data = "start";
 			openpose_pub.publish(flag);
@@ -1020,10 +996,13 @@ void openposeCallback(const std_msgs::String::ConstPtr& msg)
 	if(msg->data == "finish")
 	{
 		DealJson();
+		std_msgs::String step_;
+		step_.data = "camshift_end";
+		step_pub.publish(step_);
 	}
 }
 
-//¶©ÔÄÍ·²¿´«¸ÐÆ÷µãÔÆÏûÏ¢µÄ»Øµ÷º¯Êý
+//ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ä»Øµï¿½ï¿½ï¿½ï¿½ï¿½
 void PcloudCallback(sensor_msgs::PointCloud2 msg)
 {
 	// std::cout<<"I heard: "<<std::endl;
@@ -1049,7 +1028,7 @@ void PcloudCallback(sensor_msgs::PointCloud2 msg)
 	tf::Matrix3x3 R=CurrTf.getBasis();
 
 	//pcl::PointCloud<pcl::PointXYZ> cloud;
-    pcl::PointCloud<pcl::PointXYZRGB> cloud;//¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¶îÍâÌí¼Ó
+    pcl::PointCloud<pcl::PointXYZRGB> cloud;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     sensor_msgs::PointCloud2 oMsg;
     cloud.width  = msg.width;
     cloud.height = msg.height;
@@ -1068,7 +1047,7 @@ void PcloudCallback(sensor_msgs::PointCloud2 msg)
 	}
     for (size_t i = 0; i < cloud.points.size(); ++i)
     {
-		//°ÑÒÑÓÐµãÔÆÏûÏ¢ÖÐµÄX,Y,ZÌáÈ¡³öÀ´
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ðµï¿½X,Y,Zï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
 		floatBuffer[0]=msg.data[i*16+0];
 		floatBuffer[1]=msg.data[i*16+1];
 		floatBuffer[2]=msg.data[i*16+2];
@@ -1087,15 +1066,15 @@ void PcloudCallback(sensor_msgs::PointCloud2 msg)
 		floatBuffer[3]=msg.data[i*16+11];
 		double Z=*((float*)floatBuffer);
 
-		//ÀûÓÃ×ø±ê±ä»»½«µãÔÆ×ø±ê±äµ½map×ø±êÏµÏÂÃèÊö
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ä»»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½äµ½mapï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         cloud.points[i].x = R[0][0]*X+R[0][1]*Y+R[0][2]*Z+P[0];
         cloud.points[i].y = R[1][0]*X+R[1][1]*Y+R[1][2]*Z+P[1];
         cloud.points[i].z = R[2][0]*X+R[2][1]*Y+R[2][2]*Z+P[2];
 
-		//ºÏ³ÉÈýÎ¬RGBµãÔÆ
-		cloud.points[i].r = Img_Frame.data[i*3+2];//¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¶îÍâÌí¼Ó
-		cloud.points[i].g = Img_Frame.data[i*3+1];//¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¶îÍâÌí¼Ó
-		cloud.points[i].b = Img_Frame.data[i*3];//¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¶îÍâÌí¼Ó
+		//ï¿½Ï³ï¿½ï¿½ï¿½Î¬RGBï¿½ï¿½ï¿½ï¿½
+		cloud.points[i].r = Img_Frame.data[i*3+2];//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		cloud.points[i].g = Img_Frame.data[i*3+1];//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		cloud.points[i].b = Img_Frame.data[i*3];//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 		if (PtsIsSave)
 		{
@@ -1162,7 +1141,7 @@ void PcloudCallback(sensor_msgs::PointCloud2 msg)
 	}
 }
 
-//¶©ÔÄAvatarÖ¸ÁîÐÅÏ¢µÄ»Øµ÷º¯Êý
+//ï¿½ï¿½ï¿½ï¿½AvatarÖ¸ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Ä»Øµï¿½ï¿½ï¿½ï¿½ï¿½
 void CleanupMsgCallback(interactive_cleanup::InteractiveCleanupMsg msg)
 {
 	cout<<msg.detail<<"\t"<<msg.message<<endl;
@@ -1173,7 +1152,7 @@ void CleanupMsgCallback(interactive_cleanup::InteractiveCleanupMsg msg)
 		PtsStaticNum++;
 		PngStaticNum++;
 	}
-	if(msg.message == "Are_you_ready?")
+	/*if(msg.message == "Are_you_ready?")
 	{
 		std::cout <<"SAY I AM READY" << endl;
 		interactive_cleanup::InteractiveCleanupMsg interactive_cleanup_msg;
@@ -1181,15 +1160,16 @@ void CleanupMsgCallback(interactive_cleanup::InteractiveCleanupMsg msg)
 		Avatar_pub.publish(interactive_cleanup_msg);
 		ROS_INFO("TASK START");
 	}
+	*/
 }
 
 
 int main(int argc, char **argv)
 {
-	ReadModelsXml(xml_dir,M_Pos_Furniture,Furniture_Names);//¶ÁÈ¡xmlÎÄ¼þ
-	int N_DCP=Furniture_Names.size()-1;//Ç°¶àÉÙ¸öÊÇDCPµÄ¼Ò¾ß
-	M_Pos_DCP_=Mat::ones(4,N_DCP,CV_64F);//Ã¿Ò»ÁÐ¶¼ÊÇxyz1
-	double*pM_Pos_DCP_=(double*)(M_Pos_DCP_.data);//Ã¿Ò»ÐÐ¶¼ÊÇxyz xyz xyz
+	ReadModelsXml(xml_dir,M_Pos_Furniture,Furniture_Names);//ï¿½ï¿½È¡xmlï¿½Ä¼ï¿½
+	int N_DCP=Furniture_Names.size()-1;//Ç°ï¿½ï¿½ï¿½Ù¸ï¿½ï¿½ï¿½DCPï¿½Ä¼Ò¾ï¿½
+	M_Pos_DCP_=Mat::ones(4,N_DCP,CV_64F);//Ã¿Ò»ï¿½Ð¶ï¿½ï¿½ï¿½xyz1
+	double*pM_Pos_DCP_=(double*)(M_Pos_DCP_.data);//Ã¿Ò»ï¿½Ð¶ï¿½ï¿½ï¿½xyz xyz xyz
 	double*pM_Pos_Furniture=(double*)(M_Pos_Furniture.data);
 	for(int i=0;i<N_DCP;i++)
 	{
@@ -1200,6 +1180,8 @@ int main(int argc, char **argv)
 	}
 
 	ros::init(argc, argv, "ListenerKingNew_Xml");
+	cout << "-----------ListenerKingNew_Xml online-----------" << endl;
+	cout << "---------waiting for OpenPose message----------" << endl;
 
 	ros::NodeHandle n;
 	sub_PtCloud     = n.subscribe("/hsrb/head_rgbd_sensor/depth/points", 1, PcloudCallback);
@@ -1212,6 +1194,8 @@ int main(int argc, char **argv)
 	openpose_pub    = n.advertise<std_msgs::String>("/start_openpose", 1);
 	nav_pub         = n.advertise<std_msgs::String>("/OPAros2nav", 1);
 	step_pub        = n.advertise<std_msgs::String>("/task_control", 1);
+	Avatar_pub      = n.advertise<interactive_cleanup::InteractiveCleanupMsg>("/interactive_cleanup/message/to_moderator", 1);
+	Mat_pub         = n.advertise<std_msgs::Float64MultiArray>("/OPAros/GCPRes", 1);
 
 	tf::TransformListener Listener;
 	pListener = &Listener;

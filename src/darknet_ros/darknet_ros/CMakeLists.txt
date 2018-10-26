@@ -264,8 +264,8 @@ endif()
 
   # Object detection in images.
   #add_rostest_gtest(${PROJECT_NAME}_object_detection-test
-  #  test/object_detection.test
-  #  test/test_main.cpp
+  # test/object_detection.test
+  # test/test_main.cpp
   #  test/ObjectDetection.cpp
   #)
   #target_link_libraries(${PROJECT_NAME}_object_detection-test

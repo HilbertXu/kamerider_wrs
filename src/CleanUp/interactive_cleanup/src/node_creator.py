@@ -8,26 +8,28 @@ import os
 
 class NodeCreator:
     def __init__(self):
-        rospy.Subscriber('/killer_pub', String, self.killerCallback)
-        rospy.Subscriber('/OPAros2nav', String, self.navCallback)
-        self.creator = rospy.Publisher('/creator_pub', String, queue_size=1)
+        rospy.Subscriber('/task_control', String, self.taskCallback)
 
-    def killerCallback(self,msg):
-        if msg.data == 'restart':
-            print 'restart all nodes after 7 seconds'
-            os.system("sleep 7")
-            os.system('gnome-terminal -x bash -c "cd ~/sim_ws/src/CleanUp/CamShift_Avatar/build && ./Run.sh && read"')
-            os.system("sleep 2")
-            os.system('gnome-terminal -x bash -c "roslaunch interactive_cleanup interactive_clean_up.launch && read"')
+    def taskCallback(self,msg):
+        if msg.data == 'operation_start':
+            print '-------Operation Urd starts-------'
+            print '---------EL PSY CONGROO----------'
+            os.system('gnome-terminal -x bash -c "rosrun interactive_cleanup OPArosNew_Xml"')
+            os.system('gnome-terminal -x bash -c "rosrun interactive_cleanup GCPresPanTilt"')            
+            os.system('gnome-terminal -x bash -c "cd && rosrun interactive_cleanup GetGCPinDarknet -base_link_Name base_link -rgbdFrame_Name head_rgbd_sensor_depth_frame -ResEtheld 1 -ResSetHeadT 4 -DarknetShouldNum 3 -xmlPath /home/kamerider/sim_ws/src/CleanUp/interactive_cleanup/MPoseNew.xml && read"')
+        
+        if msg.data == 'openpose_start':
+            os.system('gnome-terminal -x bash -c "rosrun openpose_ros openpose_ros.py"')
+            os.system('gnome-terminal -x bash -c "roslaunch darknet_ros darknet_ros.launch"')
 
-    def navCallback(self,msg):
-        if msg.data == 'start':
-            os.system("rosrun interactive_cleanup find_graspable_object")
-            os.system("sleep 2")
-            os.system("rosrun interactive_cleanup DOFmove_AutoGcpDcp -isNav false -Kvx 1 -Kvy 1 -eTheld 0.001 -dT 0.05 -Hg 0.15 -JointDurT 1")
-            os.system("sleep 2")
+        if msg.data == 'grasp_start':
+            print '--------Operation Skuld starts--------'
+            print '-----------EL PSY CONGROO-------------'
+            os.system('gnome-terminal -x bash -c "rosrun interactive_cleanup DOFmove_AutoGcp -externNavCmd \'rosrun interactive_cleanup FromONavPts -Kvx 1 -Kvy 1 -eTheld 0.005 -FocusRow 72 -FocusCol 320 -dT 0.1 -headT 5\' true && read"')
+            os.system("sleep 1")
 
 if __name__ == '__main__':
+
     rospy.init_node('node_creator')
     print '--------------------init--------------------'
     print '-----------THE CREATOR OF ALL NODES---------'

@@ -717,19 +717,11 @@ gtest_force_shared_crt:BOOL=OFF
 //Dependencies for the target
 gtest_main_LIB_DEPENDS:STATIC=general;-lpthread;general;gtest;
 
-//Value Computed by CMake
-i_image_BINARY_DIR:STATIC=/home/kamerider/sim_ws/build/i_image
-
-//Value Computed by CMake
-i_image_SOURCE_DIR:STATIC=/home/kamerider/sim_ws/src/i_image
-
 //The directory containing a CMake configuration file for image_transport.
 image_transport_DIR:PATH=/opt/ros/kinetic/share/image_transport/cmake
 
 //Value Computed by CMake
 interactive_cleanup_BINARY_DIR:STATIC=/home/kamerider/sim_ws/build/CleanUp/interactive_cleanup
-
-interactive_cleanup_DIR:PATH=
 
 //Value Computed by CMake
 interactive_cleanup_SOURCE_DIR:STATIC=/home/kamerider/sim_ws/src/CleanUp/interactive_cleanup
@@ -817,12 +809,6 @@ rostime_DIR:PATH=/opt/ros/kinetic/share/rostime/cmake
 
 //The directory containing a CMake configuration file for sensor_msgs.
 sensor_msgs_DIR:PATH=/opt/ros/kinetic/share/sensor_msgs/cmake
-
-//Value Computed by CMake
-sigverse_open_manipulator_BINARY_DIR:STATIC=/home/kamerider/sim_ws/build/darknet_ros/sigverse_open_manipulator
-
-//Value Computed by CMake
-sigverse_open_manipulator_SOURCE_DIR:STATIC=/home/kamerider/sim_ws/src/darknet_ros/sigverse_open_manipulator
 
 //Value Computed by CMake
 sigverse_ros_bridge_BINARY_DIR:STATIC=/home/kamerider/sim_ws/build/sigverse_ros_package/sigverse_ros_bridge
@@ -1023,7 +1009,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=12
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
