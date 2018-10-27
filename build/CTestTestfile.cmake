@@ -5,6 +5,7 @@
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
 subdirs(gtest)
+subdirs(human_navigation)
 subdirs(CleanUp/interactive_cleanup)
 subdirs(CleanUp/openpose_ros)
 subdirs(darknet_ros/darknet_ros_msgs)

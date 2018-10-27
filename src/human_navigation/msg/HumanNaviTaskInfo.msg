@@ -1,0 +1,5 @@
+string environment_id
+HumanNaviObjectInfo target_object
+HumanNaviDestination destination
+HumanNaviObjectInfo[] non_target_objects
+HumanNaviObjectInfo[] furniture

@@ -1,0 +1,8 @@
+prefix=/home/kamerider/sim_ws/devel
+
+Name: human_navigation
+Description: Description of human_navigation
+Version: 0.0.0
+Cflags: -I/home/kamerider/sim_ws/devel/include
+Libs: -L/home/kamerider/sim_ws/devel/lib 
+Requires: message_runtime

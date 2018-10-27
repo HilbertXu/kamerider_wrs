@@ -117,6 +117,7 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/kamerider/sim_ws/build/gtest/cmake_install.cmake")
+  include("/home/kamerider/sim_ws/build/human_navigation/cmake_install.cmake")
   include("/home/kamerider/sim_ws/build/CleanUp/interactive_cleanup/cmake_install.cmake")
   include("/home/kamerider/sim_ws/build/CleanUp/openpose_ros/cmake_install.cmake")
   include("/home/kamerider/sim_ws/build/darknet_ros/darknet_ros_msgs/cmake_install.cmake")

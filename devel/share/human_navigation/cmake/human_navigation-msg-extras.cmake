@@ -1,0 +1,2 @@
+set(human_navigation_MESSAGE_FILES "/home/kamerider/sim_ws/src/human_navigation/msg/HumanNaviObjectInfo.msg;/home/kamerider/sim_ws/src/human_navigation/msg/HumanNaviDestination.msg;/home/kamerider/sim_ws/src/human_navigation/msg/HumanNaviTaskInfo.msg;/home/kamerider/sim_ws/src/human_navigation/msg/HumanNaviMsg.msg;/home/kamerider/sim_ws/src/human_navigation/msg/HumanNaviGuidanceMsg.msg;/home/kamerider/sim_ws/src/human_navigation/msg/HumanNaviAvatarStatus.msg;/home/kamerider/sim_ws/src/human_navigation/msg/HumanNaviObjectStatus.msg")
+set(human_navigation_SERVICE_FILES "")
