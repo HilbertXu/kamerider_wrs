@@ -1,8 +1,0 @@
-prefix=/home/kamerider/sim_ws/devel
-
-Name: sigverse_turtlebot2
-Description: Description of sigverse_turtlebot2
-Version: 0.1.0
-Cflags: 
-Libs: -L/home/kamerider/sim_ws/devel/lib 
-Requires: geometry_msgs roscpp rospy std_msgs

@@ -1,8 +1,0 @@
-prefix=/home/kamerider/sim_ws/devel
-
-Name: sigverse_ros_bridge
-Description: Description of sigverse_ros_bridge
-Version: 0.1.0
-Cflags: 
-Libs: -L/home/kamerider/sim_ws/devel/lib 
-Requires: 

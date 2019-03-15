@@ -1,8 +1,0 @@
-prefix=/home/kamerider/sim_ws/devel
-
-Name: openpose_ros
-Description: Description of openpose_ros
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/kamerider/sim_ws/devel/lib 
-Requires: 

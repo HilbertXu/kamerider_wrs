@@ -1,8 +1,0 @@
-prefix=/home/kamerider/sim_ws/devel
-
-Name: darknet_ros_msgs
-Description: Description of darknet_ros_msgs
-Version: 1.1.2
-Cflags: -I/home/kamerider/sim_ws/devel/include
-Libs: -L/home/kamerider/sim_ws/devel/lib 
-Requires: actionlib_msgs geometry_msgs sensor_msgs message_runtime std_msgs
